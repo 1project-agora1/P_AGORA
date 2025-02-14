@@ -23,5 +23,8 @@ assignees: ''
 - 참고사항
 
 ## Image
-[`description`]<img src =`link` width=`width size` height=`height size` />
+- Description
+  - _아래 링크에서 백틱을 제거하고 쌍따옴표 내부에 링크 및 숫자를 입력해서 사진을 업로드 해 주세요._
+    
+  <img src =`"link"` width=`"width size"` height=`"height size"` />
 
