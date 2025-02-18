@@ -1,0 +1,35 @@
+version: '3.8'
+
+## Common DB Network
+networks:
+  P_AGORA-network:
+    driver: bridge
+
+## MYSQL
+services:
+  next-local:
+    profiles: ["local"]
+    environment:
+      - NODE_ENV=local
+    volumes:
+      - ./app:/app
+      - /app/node_modules
+    ports:
+      - "3000:3000"
+    depends_on:
+      - mysql
+  mysql:
+    image: mysql:8.4
+    env_file: .env.${PROFILE:-local}
+    container_name: P_AGORA-mysql
+    environment:
+      MYSQL_ROOT_USERNAME: ${MYSQL_ROOT_USERNAME}
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DB_NAME}
+    volumes:
+      - ./data/mysql_data:/var/lib/mysql
+      - ./data/mysql-files:/var/lib/mysql-files
+    ports:
+      - "3307:3306"
+    networks:
+      - P_AGORA-network
