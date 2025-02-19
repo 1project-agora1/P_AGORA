@@ -1,0 +1,64 @@
+// client type
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["prismaSchemaFolder"]
+}
+
+// DB type
+// MySQL
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+// User
+model User {
+  id             BigInt   @id @default(autoincrement())
+  token          String   @unique // TODO: 이메일 인증을 위한 토큰
+  nickname       String   @unique // TODO: 닉네임 길이 제한 필요
+  password       String? // TODO: 비밀번호 타입 및 길이 제한 필요
+  email          String   @unique
+  email_verified Boolean  @default(false)
+  role           UserRole @default(ROLE_USER) // 초기 값 : 일반 유저
+  createdAt      DateTime @default(now()) @map("created_at")
+  updatedAt      DateTime @updatedAt @map("updated_at")
+
+  // mapping - User 1 : N Post
+  posts Post[]
+
+  @@map("user")
+}
+// UserRole - enum
+enum UserRole {   // TODO: 각 게시판 별 관리자를 Role로 따로 분리할지 추후 검토 필요
+  ROLE_DEVELOPER  // 개발자 - 모든 권한
+  ROLE_ADMIN      // 관리자 - 개발 제외 모든 운영 권한
+  ROLE_USER       // 유저 - 일반 활동 관련 권한
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+// Post
+model Post {
+  id          BigInt   @id @default(autoincrement())
+  token       String   @unique // 게시판 글 토큰
+  // board_token String // TODO: 게시판 타입 구분을 위한 board 토큰 - board 테이블 추가 필요
+  title       String
+  content     String? // 선택 사항
+  user_token  String // 유저 테이블 매핑을 위한 FK
+  views       Int      @default(0)
+  likes       Int      @default(0)
+  type        PostType // TODO: PostType 검토 필요
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  // mapping - FK : user_token
+  user User @relation(fields: [user_token], references: [token])
+
+  @@map("post")
+}
+// PostType - enum
+enum PostType { // TODO: 이 타입은 실제로 필요한지 검토 필요
+  TEXT_ONLY     // 글자만
+  MEDIA_ONLY    // 미디어만
+  TEXT_MEDIA    // 글자, 미디어 둘 다 존재
+}
