@@ -32,6 +32,10 @@ yarn-error.log*
 
 # env files (can opt-in for committing if needed)
 .env.local
+.env
+
+#vscode settings
+settings.json
 
 # vercel
 .vercel
@@ -41,3 +45,4 @@ yarn-error.log*
 next-env.d.ts
 /.idea/
 /data/
+package-lock.json
