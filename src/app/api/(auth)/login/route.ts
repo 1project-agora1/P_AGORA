@@ -22,7 +22,7 @@ export async function POST(request: Request) {
             )
         }
 
-        // 비밀번호 검증 (await 추가)
+        // 비밀번호 검증
         const isPasswordValid = bcrypt.compare(password, user.password)
         if (!isPasswordValid) {
             return new Response(
