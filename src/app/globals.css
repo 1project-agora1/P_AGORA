@@ -2,6 +2,27 @@
 @tailwind components;
 @tailwind utilities;
 
+@font-face {
+  font-family: "LineSeedFont";
+  src: url("/fonts/LINESeedKR-Bd.ttf") format("truetype");
+  font-weight: 700;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: "LineSeedFont";
+  src: url("/fonts/LINESeedKR-Rg.ttf") format("truetype");
+  font-weight: 400;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: "LineSeedFont";
+  src: url("/fonts/LINESeedKR-Th.ttf") format("truetype");
+  font-weight: 100;
+  font-style: normal;
+}
+
 :root {
   --background: #ffffff;
   --foreground: #171717;
@@ -17,5 +38,5 @@
 body {
   color: var(--foreground);
   background: var(--background);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: "LineSeedFont", Arial, Helvetica, sans-serif;
 }
