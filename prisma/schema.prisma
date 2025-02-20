@@ -17,7 +17,7 @@ model User {
   id             BigInt   @id @default(autoincrement())
   token          String   @unique // TODO: 이메일 인증을 위한 토큰
   nickname       String   @unique // TODO: 닉네임 길이 제한 필요
-  password       String? // TODO: 비밀번호 타입 및 길이 제한 필요
+  password       String // TODO: 비밀번호 타입 및 길이 제한 필요
   email          String   @unique
   email_verified Boolean  @default(false)
   role           UserRole @default(ROLE_USER) // 초기 값 : 일반 유저
