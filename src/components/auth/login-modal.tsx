@@ -25,7 +25,7 @@ export default function LoginModal({
             }}
         >
             <h2 className="text-2xl font-bold mb-4">로그인</h2>
-            <LoginForm onSuccess={onClose} />
+            <LoginForm onSuccess={onClose} onClose={onClose} />
         </Dialog>
     );
 }

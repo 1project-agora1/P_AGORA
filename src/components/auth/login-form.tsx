@@ -3,8 +3,14 @@
 import {LoginValidator} from "@/lib/validator"
 import {z} from "zod"
 import React from "react";
+import Link from 'next/link';
 
-export default function LoginForm({onSuccess}: { onSuccess?: () => void }) {
+export default function LoginForm({
+                                      onSuccess, onClose
+                                  }: {
+    onSuccess?: () => void;
+    onClose?: () => void
+}) {
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault()
         const formData = new FormData(e.currentTarget as HTMLFormElement)
@@ -55,7 +61,20 @@ export default function LoginForm({onSuccess}: { onSuccess?: () => void }) {
                 required
                 minLength={6}
             />
-            <button type="submit">Login</button>
+            <button type="submit">로그인</button>
+
+            <div className="mt-4 text-center">
+                <span className="text-gray-500">계정이 없으신가요? </span>
+                <Link
+                    href="/register"
+                    prefetch={false}
+                    onClick={onClose}
+                    className="text-blue-600 hover:underline"
+                >
+                    회원가입
+                </Link>
+            </div>
         </form>
+
     )
 }
