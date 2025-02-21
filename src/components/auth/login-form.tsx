@@ -1,9 +1,10 @@
 "use client"
 
-import { LoginValidator } from "@/lib/validator"
-import { z } from "zod"
+import {LoginValidator} from "@/lib/validator"
+import {z} from "zod"
+import React from "react";
 
-export default function LoginForm() {
+export default function LoginForm({onSuccess}: { onSuccess?: () => void }) {
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault()
         const formData = new FormData(e.currentTarget as HTMLFormElement)
@@ -17,11 +18,12 @@ export default function LoginForm() {
 
             const res = await fetch('/api/login', {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                headers: {'Content-Type': 'application/json'},
                 body: JSON.stringify(validatedData)
             })
 
-            if(res.ok) {
+            if (res.ok) {
+                onSuccess?.(); // 모달 닫기 호출
                 window.location.href = '/dashboard'
             } else {
                 const errorData = await res.json()
