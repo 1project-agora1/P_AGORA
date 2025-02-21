@@ -1,14 +1,18 @@
 "use client";
 
 import Image from "next/image";
-import Link from "next/link";
 import { useEffect, useState } from "react";
 import { RiMenuLine } from "react-icons/ri";
-import Sidebar from "../sidebar/Sidebar"; // 사이드바 컴포넌트 추가
+import Sidebar from "../sidebar/Sidebar";
+import LoginModal from "@/components/auth/login-modal"; // 사이드바 컴포넌트 추가
 
 export default function Header() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false); // 사이드바 상태 추가
+  const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
+
+  const openLoginModal = () => setIsLoginModalOpen(true);
+  const closeLoginModal = () => setIsLoginModalOpen(false);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -56,8 +60,13 @@ export default function Header() {
           </div>
           {/* 회원 정보 */}
           <div className="hidden md:block hover:text-primaryThin cursor-pointer">
-            <Link href={"/login"}>로그인</Link>
+            <button onClick={openLoginModal}>로그인</button>
+            <LoginModal
+                open={isLoginModalOpen}
+                onClose={closeLoginModal}
+            />
           </div>
+
           {/* 모바일 메뉴 버튼 */}
           <div className="md:hidden">
             <button

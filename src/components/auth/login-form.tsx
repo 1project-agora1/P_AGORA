@@ -1,9 +1,16 @@
 "use client"
 
-import { LoginValidator } from "@/lib/validator"
-import { z } from "zod"
+import {LoginValidator} from "@/lib/validator"
+import {z} from "zod"
+import React from "react";
+import Link from 'next/link';
 
-export default function LoginForm() {
+export default function LoginForm({
+                                      onSuccess, onClose
+                                  }: {
+    onSuccess?: () => void;
+    onClose?: () => void
+}) {
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault()
         const formData = new FormData(e.currentTarget as HTMLFormElement)
@@ -17,11 +24,12 @@ export default function LoginForm() {
 
             const res = await fetch('/api/login', {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                headers: {'Content-Type': 'application/json'},
                 body: JSON.stringify(validatedData)
             })
 
-            if(res.ok) {
+            if (res.ok) {
+                onSuccess?.(); // 모달 닫기 호출
                 window.location.href = '/dashboard'
             } else {
                 const errorData = await res.json()
@@ -53,7 +61,20 @@ export default function LoginForm() {
                 required
                 minLength={6}
             />
-            <button type="submit">Login</button>
+            <button type="submit">로그인</button>
+
+            <div className="mt-4 text-center">
+                <span className="text-gray-500">계정이 없으신가요? </span>
+                <Link
+                    href="/register"
+                    prefetch={false}
+                    onClick={onClose}
+                    className="text-blue-600 hover:underline"
+                >
+                    회원가입
+                </Link>
+            </div>
         </form>
+
     )
 }

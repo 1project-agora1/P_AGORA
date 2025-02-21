@@ -11,10 +11,15 @@
     "prisma:migrate:dev": "dotenv -e .env.local -- prisma migrate dev --name"
   },
   "dependencies": {
+    "@emotion/react": "^11.14.0",
+    "@emotion/styled": "^11.14.0",
     "@hookform/resolvers": "^4.1.0",
+    "@mui/material": "^6.4.5",
+    "@mui/styled-engine-sc": "^6.4.3",
     "@prisma/client": "^6.3.1",
     "bcryptjs": "^3.0.2",
     "dotenv": "^16.4.7",
+    "emotion": "^11.0.0",
     "jose": "^5.10.0",
     "jsonwebtoken": "^9.0.2",
     "next": "15.1.6",
