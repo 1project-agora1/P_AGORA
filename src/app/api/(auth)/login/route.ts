@@ -1,6 +1,7 @@
 import {PrismaClient} from '@prisma/client'
 import bcrypt from 'bcryptjs'
 import {setCookie} from "@/lib/cookies";
+import {ApiResponse} from "@/lib/api-response";
 
 export async function POST(request: Request) {
     const prisma = new PrismaClient()
@@ -16,34 +17,36 @@ export async function POST(request: Request) {
 
         // 조기 반환 패턴 적용
         if (!user) {
-            return new Response(
-                JSON.stringify({error: '인증 실패'}),
-                {status: 401}
-            )
+            return Response.json({
+                success: false,
+                error: '인증 실패'
+            } as ApiResponse, {status: 401})
         }
 
         // 비밀번호 검증
         const isPasswordValid = bcrypt.compare(password, user.password)
         if (!isPasswordValid) {
-            return new Response(
-                JSON.stringify({error: '인증 실패'}),
-                {status: 401}
-            )
+            return Response.json({
+                success: false,
+                error: '인증 실패'
+            } as ApiResponse, {status: 401})
         }
 
         // 쿠키 설정
         await setCookie('accessToken', user.id.toString());
 
-        return new Response(
-            JSON.stringify({user: {id: user.id.toString()}}),
-            {status: 200}
-        )
+        return Response.json({
+            success: true,
+            data: {
+                user: {id: user.id.toString()}
+            }
+        } as ApiResponse<{ user: { id: string } }>, {status: 200})
     } catch (error) {
         console.error('로그인 에러', error)
-        return new Response(
-            JSON.stringify({error: '서버 에러'}),
-            {status: 500}
-        )
+        return Response.json({
+            success: false,
+            error: '서버 에러'
+        } as ApiResponse, {status: 500})
     } finally {
         await prisma.$disconnect()
     }

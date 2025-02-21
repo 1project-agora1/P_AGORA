@@ -17,7 +17,7 @@ export async function POST(request: Request) {
             return Response.json({
                 success: false,
                 errors: validation.error.flatten().fieldErrors
-            } as ApiResponse)
+            } as ApiResponse, {status: 500})
         }
 
         const {nickname, email, password} = validation.data
@@ -40,7 +40,7 @@ export async function POST(request: Request) {
             return Response.json({
                 success: false,
                 error: errorMessage
-            } as ApiResponse)
+            } as ApiResponse, {status: 500})
         }
 
         // 사용자 생성
@@ -60,14 +60,14 @@ export async function POST(request: Request) {
         return Response.json({
             success: true,
             data: {nickname: user.nickname, email: user.email}
-        } as ApiResponse<{ nickname: string; email: string }>)
+        } as ApiResponse<{ nickname: string; email: string }>, {status: 200})
 
     } catch (error) {
         console.error('회원 가입 에러', error)
         return Response.json({
             success: false,
             error: '회원 가입 중 오류 발생'
-        } as ApiResponse)
+        } as ApiResponse, {status: 500})
     } finally {
         await prisma.$disconnect()
     }
