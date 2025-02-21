@@ -46,4 +46,3 @@ next-env.d.ts
 /.idea/
 /data/
 package-lock.json
-/prisma/migrations/
