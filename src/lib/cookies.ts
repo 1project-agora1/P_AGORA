@@ -2,12 +2,12 @@ import {cookies} from "next/headers";
 import jwt from "jsonwebtoken";
 
 // 쿠키 설정
-export async function setCookie(cookieName:string, userId:string) {
+export async function setCookie(cookieName: string, nickname: string, email: string) {
     const cookie = await cookies();
 
     // JWT 생성
     const token = jwt.sign(
-        {userId: userId},
+        {nickname: nickname, email: email},
         process.env.JWT_SECRET!,
         {expiresIn: '1h'}
     )
@@ -24,7 +24,7 @@ export async function setCookie(cookieName:string, userId:string) {
 }
 
 // 쿠키 삭제
-export async function deleteCookie(cookieName:string) {
+export async function deleteCookie(cookieName: string) {
     const cookie = await cookies();
     cookie.delete(cookieName)
 }
