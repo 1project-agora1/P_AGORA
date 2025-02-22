@@ -62,3 +62,43 @@ enum PostType { // TODO: 이 타입은 실제로 필요한지 검토 필요
   MEDIA_ONLY    // 미디어만
   TEXT_MEDIA    // 글자, 미디어 둘 다 존재
 }
+
+
+// ---------------------------------------------------------------------------------------------------------------------
+// Channel
+model Channel {
+  id         BigInt   @id @default(autoincrement())
+  token      String   @unique
+  menu_name  String
+  url        String
+  createdAt  DateTime @default(now()) @map("created_at")
+  updatedAt  DateTime @updatedAt @map("updated_at")
+
+  // mapping - Channel 1 : N ChannelItem
+  channelItems ChannelItem[]
+
+  @@map("channel")
+}
+
+
+// ---------------------------------------------------------------------------------------------------------------------
+// ChannelItem
+model ChannelItem {
+  id                 BigInt   @id @default(autoincrement())
+  token              String   @unique
+  parent_menu_token  String
+  parent_submenu_token String?
+  submenu_name       String
+  url                String
+  createdAt          DateTime @default(now()) @map("created_at")
+  updatedAt          DateTime @updatedAt @map("updated_at")
+
+  // mapping - FK : parent_menu_token
+  channel Channel @relation(fields: [parent_menu_token], references: [token])
+  // mapping - FK : parent_submenu_token
+  parent ChannelItem? @relation("ParentSubmenu", fields: [parent_submenu_token], references: [token])
+  children ChannelItem[] @relation("ParentSubmenu")
+
+  @@map("channel_item")
+}
+
