@@ -55,12 +55,11 @@ export async function POST(request: Request) {
         })
 
         // 쿠키 설정
-        await setCookie('accessToken', user.id.toString());
+        await setCookie('accessToken', user.nickname, user.email);
 
         return Response.json({
-            success: true,
-            data: {nickname: user.nickname, email: user.email}
-        } as ApiResponse<{ nickname: string; email: string }>, {status: 200})
+            success: true
+        } as ApiResponse, {status: 200})
 
     } catch (error) {
         console.error('회원 가입 에러', error)

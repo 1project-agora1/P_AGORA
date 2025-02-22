@@ -12,7 +12,12 @@ export async function POST(request: Request) {
         // 단일 DB 쿼리로 사용자 조회 및 검증
         const user = await prisma.user.findUnique({
             where: {email},
-            select: {id: true, password: true}
+            select: {
+                id: true,
+                password: true,
+                nickname: true,
+                email: true
+            }
         }).then(user => user ? {...user, password: user.password!} : null)
 
         // 조기 반환 패턴 적용
@@ -33,14 +38,11 @@ export async function POST(request: Request) {
         }
 
         // 쿠키 설정
-        await setCookie('accessToken', user.id.toString());
+        await setCookie('accessToken', user.nickname, user.email);
 
         return Response.json({
-            success: true,
-            data: {
-                user: {id: user.id.toString()}
-            }
-        } as ApiResponse<{ user: { id: string } }>, {status: 200})
+            success: true
+        } as ApiResponse, {status: 200})
     } catch (error) {
         console.error('로그인 에러', error)
         return Response.json({
