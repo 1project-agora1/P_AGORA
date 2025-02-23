@@ -1,15 +1,24 @@
 "use client";
 
+import dynamic from "next/dynamic";
 import Image from "next/image";
+import Link from "next/link";
 import { useEffect, useState } from "react";
 import { RiMenuLine } from "react-icons/ri";
+import { useChannels } from "../channel/Channel";
 import Sidebar from "../sidebar/Sidebar";
-import LoginModal from "@/components/auth/login-modal"; // 사이드바 컴포넌트 추가
+
+const DynamicLoginModal = dynamic(
+  () => import("@/components/auth/login-modal"),
+  { ssr: false }
+);
 
 export default function Header() {
+  const { channels } = useChannels();
   const [isScrolled, setIsScrolled] = useState(false);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false); // 사이드바 상태 추가
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
+  const [activeChannel, setActiveChannel] = useState<string | null>(null); // 활성 채널 상태 추가
 
   const openLoginModal = () => setIsLoginModalOpen(true);
   const closeLoginModal = () => setIsLoginModalOpen(false);
@@ -33,6 +42,12 @@ export default function Header() {
     setIsSidebarOpen(!isSidebarOpen);
   };
 
+  const toggleChannel = (channelToken: string) => {
+    setActiveChannel((prevChannel) =>
+      prevChannel === channelToken ? null : channelToken
+    );
+  };
+
   return (
     <>
       <header
@@ -52,18 +67,41 @@ export default function Header() {
             </div>
           </div>
           {/* 모바일에서는 숨기기 */}
-          <div className="hidden md:flex flex-row w-[40%] justify-between">
-            <div className="hover:text-primaryThin cursor-pointer">채널1</div>
-            <div className="hover:text-primaryThin cursor-pointer">채널2</div>
-            <div className="hover:text-primaryThin cursor-pointer">채널3</div>
-            <div className="hover:text-primaryThin cursor-pointer">채널4</div>
+          <div className={`hidden md:flex flex-row justify-between w-auto`}>
+            {channels.map((channel) => (
+              <div
+                key={channel.token}
+                className="relative hidden md:flex flex-col"
+              >
+                <div
+                  className="hover:text-primary font-bold cursor-pointer mx-4 text-xl"
+                  onClick={() => toggleChannel(channel.token)}
+                >
+                  {channel.menu_name}
+                </div>
+                {activeChannel === channel.token && channel.channelItems && (
+                  <div className="absolute flex flex-col  w-[100px] top-full mt-2 bg-white shadow-lg rounded-md">
+                    {channel.channelItems.map((item) => (
+                      <div
+                        key={item.token}
+                        className="hover:text-primaryThin cursor-pointer text-nowrap text-ellipsis overflow-hidden px-4 py-2"
+                      >
+                        <Link href={`${channel.url}/${item.url}`}>
+                          {item.submenu_name}
+                        </Link>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            ))}
           </div>
           {/* 회원 정보 */}
           <div className="hidden md:block hover:text-primaryThin cursor-pointer">
             <button onClick={openLoginModal}>로그인</button>
-            <LoginModal
-                open={isLoginModalOpen}
-                onClose={closeLoginModal}
+            <DynamicLoginModal
+              open={isLoginModalOpen}
+              onClose={closeLoginModal}
             />
           </div>
 
