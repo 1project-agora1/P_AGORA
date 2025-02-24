@@ -3,7 +3,6 @@ import {PrismaClientManager} from '@/lib/client/PrismaClientManager'
 export class UserQuery {
     async findByEmailWithPassword(email: string) {
         const prisma = PrismaClientManager.getClient()
-        // 단일 DB 쿼리로 사용자 조회 및 검증
         return prisma.user.findUnique({
             where: {email},
             select: {
