@@ -1,5 +1,6 @@
 "use client";
 
+import { Skeleton } from "@mui/material";
 import dynamic from "next/dynamic";
 import Image from "next/image";
 import Link from "next/link";
@@ -14,7 +15,7 @@ const DynamicLoginModal = dynamic(
 );
 
 export default function Header() {
-  const { channels } = useChannels();
+  const { channels, loading } = useChannels();
   const [isScrolled, setIsScrolled] = useState(false);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false); // 사이드바 상태 추가
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
@@ -58,43 +59,54 @@ export default function Header() {
         }`}
       >
         <div className="container mx-auto flex flex-row justify-between items-center">
-          <div className="flex flex-row items-center">
-            <Image src="/images/logo.png" alt="Logo" width={50} height={50} />
-            <div>
-              <span className="uppercase font-semibold hover:text-primary">
-                agora
-              </span>
+          <Link href="/">
+            <div className="flex flex-row items-center">
+              <Image src="/images/logo.png" alt="Logo" width={50} height={50} />
+              <div>
+                <span className="uppercase font-semibold hover:text-primary">
+                  agora
+                </span>
+              </div>
             </div>
-          </div>
+          </Link>
           {/* 모바일에서는 숨기기 */}
           <div className={`hidden md:flex flex-row justify-between w-auto`}>
-            {channels.map((channel) => (
-              <div
-                key={channel.token}
-                className="relative hidden md:flex flex-col"
-              >
-                <div
-                  className="hover:text-primary font-bold cursor-pointer mx-4 text-xl"
-                  onClick={() => toggleChannel(channel.token)}
-                >
-                  {channel.menu_name}
-                </div>
-                {activeChannel === channel.token && channel.channelItems && (
-                  <div className="absolute flex flex-col  w-[100px] top-full mt-2 bg-white shadow-lg rounded-md">
-                    {channel.channelItems.map((item) => (
-                      <div
-                        key={item.token}
-                        className="hover:text-primaryThin cursor-pointer text-nowrap text-ellipsis overflow-hidden px-4 py-2"
-                      >
-                        <Link href={`${channel.url}/${item.url}`}>
-                          {item.submenu_name}
-                        </Link>
-                      </div>
-                    ))}
-                  </div>
-                )}
+            {loading ? (
+              <div className="flex flex-row space-x-4">
+                <Skeleton className="w-24" />
+                <Skeleton className="w-24" />
+                <Skeleton className="w-24" />
+                <Skeleton className="w-24" />
               </div>
-            ))}
+            ) : (
+              channels.map((channel) => (
+                <div
+                  key={channel.token}
+                  className="relative hidden md:flex flex-col"
+                >
+                  <div
+                    className="hover:text-primary font-bold cursor-pointer mx-4 text-xl"
+                    onClick={() => toggleChannel(channel.token)}
+                  >
+                    {channel.menu_name}
+                  </div>
+                  {activeChannel === channel.token && channel.channelItems && (
+                    <div className="absolute flex flex-col  w-[100px] top-full mt-2 bg-white shadow-lg rounded-md">
+                      {channel.channelItems.map((item) => (
+                        <div
+                          key={item.token}
+                          className="hover:text-primaryThin cursor-pointer text-nowrap text-ellipsis overflow-hidden px-4 py-2"
+                        >
+                          <Link href={`${channel.url}/${item.url}`}>
+                            {item.submenu_name}
+                          </Link>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              ))
+            )}
           </div>
           {/* 회원 정보 */}
           <div className="hidden md:block hover:text-primaryThin cursor-pointer">
