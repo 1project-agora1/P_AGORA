@@ -1,14 +1,14 @@
 import {RegisterValidator} from '@/lib/validator'
 import {ApiResponse} from '@/lib/api-response'
-import bcrypt from 'bcryptjs'
-import {PrismaClient} from '@prisma/client'
-import {setCookie} from "@/lib/cookies";
+import {UserRepository} from "@/lib/repository/UserRepository";
+import {PrismaClientManager} from "@/lib/client/PrismaClientManager";
+import {DuplicateUserError} from "@/lib/errors/AuthError";
 
-const prisma = new PrismaClient()
 
 export async function POST(request: Request) {
     try {
-        // TODO: validator 및 dto 등 사용 검토 필요
+        const userRepository = new UserRepository()
+
         const body = await request.json()
         const validation = RegisterValidator.safeParse(body)
 
@@ -20,54 +20,34 @@ export async function POST(request: Request) {
             } as ApiResponse, {status: 500})
         }
 
+        // 유저 검증
         const {nickname, email, password} = validation.data
+        await userRepository.findValidUserByEmailAndNickname(email, nickname)
 
-        // 단일 쿼리로 중복 체크 최적화
-        const existingUser = await prisma.user.findFirst({
-            where: {
-                OR: [{email}, {nickname}]
-            },
-            select: {email: true, nickname: true}
-        })
-
-        // 중복 에러 처리
-        if (existingUser) {
-            const errorMessage =
-                existingUser.email === email
-                    ? '이미 사용 중인 이메일입니다'
-                    : '이미 사용 중인 닉네임입니다'
-
-            return Response.json({
-                success: false,
-                error: errorMessage
-            } as ApiResponse, {status: 500})
-        }
 
         // 사용자 생성
-        const hashedPassword = await bcrypt.hash(password, 10)
-        const user = await prisma.user.create({
-            data: {
-                nickname,
-                email,
-                password: hashedPassword,
-                token: crypto.randomUUID()
-            }
-        })
+        await userRepository.createNewUser(email, nickname, password)
 
-        // 쿠키 설정
-        await setCookie('accessToken', user.nickname, user.email);
 
         return Response.json({
             success: true
         } as ApiResponse, {status: 200})
 
     } catch (error) {
+        // 커스텀 에러
+        if (error instanceof DuplicateUserError) {
+            return Response.json(
+                {success: false, error: error.message},
+                {status: 403}
+            )
+        }
+
         console.error('회원 가입 에러', error)
         return Response.json({
             success: false,
             error: '회원 가입 중 오류 발생'
         } as ApiResponse, {status: 500})
     } finally {
-        await prisma.$disconnect()
+        await PrismaClientManager.shutdown()
     }
 }
