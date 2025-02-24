@@ -1,15 +1,15 @@
-import {deleteCookie} from "@/lib/cookies";
 import {ApiResponse} from "@/lib/api-response";
+import {UserRepository} from "@/lib/repository/UserRepository";
 
 export async function POST() {
     try {
+        const userRepository = new UserRepository()
         // 액세스 토큰 쿠키 삭제
-        await deleteCookie('accessToken')
+        await userRepository.deleteCookie(process.env.ACCESS_TOKEN!)
 
         return Response.json({
             success: true
         } as ApiResponse, {status: 200})
-
     } catch (error) {
         console.error('로그아웃 에러', error)
         return Response.json({
