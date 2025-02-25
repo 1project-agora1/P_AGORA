@@ -2,7 +2,7 @@
 
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { RegisterValidator } from '@/lib/validator'
+import { RegisterValidator } from '@/lib/Validator'
 import type { z } from 'zod'
 
 type FormValues = z.infer<typeof RegisterValidator>

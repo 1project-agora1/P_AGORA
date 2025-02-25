@@ -1,6 +1,6 @@
-import { ApiResponse } from "@/lib/api-response";
+import { ApiResponse } from "@/lib/ApiResponse";
 import useSWR from "swr";
-import { Channel } from "../types/ChannerType";
+import { Channel } from "@/lib/types/ChannerType";
 
 const fetcher = (url: string) => fetch(url).then((res) => res.json());
 

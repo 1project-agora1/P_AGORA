@@ -1,6 +1,6 @@
 "use client"
 
-import {LoginValidator} from "@/lib/validator"
+import {LoginValidator} from "@/lib/Validator"
 import {z} from "zod"
 import React from "react";
 import Link from 'next/link';

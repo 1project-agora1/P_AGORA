@@ -1,4 +1,4 @@
-import {ApiResponse} from "@/lib/api-response";
+import {ApiResponse} from "@/lib/ApiResponse";
 import {UserRepository} from "@/lib/repository/UserRepository";
 import {PrismaClientManager} from "@/lib/client/PrismaClientManager";
 import {AuthenticationError} from "@/lib/errors/AuthError";

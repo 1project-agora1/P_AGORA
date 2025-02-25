@@ -1,7 +1,7 @@
 import bcrypt from 'bcryptjs'
 import {UserQuery} from '@/lib/query/UserQuery'
 import {AuthenticationError, DuplicateUserError} from "@/lib/errors/AuthError";
-import {deleteCookie, setCookie} from "@/lib/cookies";
+import {deleteCookie, setCookie} from "@/lib/Cookies";
 
 export class UserRepository {
     private query: UserQuery

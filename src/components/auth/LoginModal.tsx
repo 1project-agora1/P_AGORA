@@ -1,5 +1,5 @@
 import { Dialog } from '@mui/material';
-import LoginForm from './login-form';
+import LoginForm from './LoginForm';
 
 export default function LoginModal({
                                        open,

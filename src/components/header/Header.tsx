@@ -10,7 +10,7 @@ import { useChannels } from "../channel/Channel";
 import Sidebar from "../sidebar/Sidebar";
 
 const DynamicLoginModal = dynamic(
-  () => import("@/components/auth/login-modal"),
+  () => import("@/components/auth/LoginModal"),
   { ssr: false }
 );
 
