@@ -2,7 +2,7 @@
 
 import React, {useState} from 'react'
 import {useRouter} from 'next/navigation'
-import LoadingSpinner from '@/components/loading-spinner'
+import LoadingSpinner from '@/components/LoadingSpinner'
 
 export default function LogoutForm() {
     const router = useRouter()
