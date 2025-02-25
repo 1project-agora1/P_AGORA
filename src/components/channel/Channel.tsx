@@ -1,46 +1,18 @@
-"use client";
-import { useEffect, useRef, useState } from "react";
+import { ApiResponse } from "@/lib/api-response";
+import useSWR from "swr";
 import { Channel } from "../types/ChannerType";
 
-interface ApiResponse<T> {
-  success: boolean;
-  data?: T;
-  error?: string;
-}
+const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
 export function useChannels() {
-  const [channels, setChannels] = useState<Channel[]>([]);
-  const [loading, setLoading] = useState<boolean>(true);
-  const [error, setError] = useState<string | null>(null);
-  const cache = useRef<Channel[] | null>(null);
+  const { data, error } = useSWR<ApiResponse<Channel[]>>(
+    "/api/channel/list",
+    fetcher
+  );
 
-  useEffect(() => {
-    async function fetchChannels() {
-      if (cache.current) {
-        setChannels(cache.current);
-        setLoading(false);
-        return;
-      }
-
-      try {
-        const response = await fetch("/api/channel/list");
-        const result: ApiResponse<Channel[]> = await response.json();
-
-        if (result.success) {
-          cache.current = result.data || [];
-          setChannels(result.data || []);
-        } else {
-          setError(result.error || "Unknown error");
-        }
-      } catch {
-        setError("Failed to fetch channels");
-      } finally {
-        setLoading(false);
-      }
-    }
-
-    fetchChannels();
-  }, []);
-
-  return { channels, loading, error };
+  return {
+    channels: data?.data || [],
+    loading: !error && !data,
+    error: error || (data && !data.success ? data.error : null),
+  };
 }
