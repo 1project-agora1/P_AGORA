@@ -1,4 +1,4 @@
-import { ApiResponse } from "@/lib/api-response";
+import { ApiResponse } from "@/lib/ApiResponse";
 import { PrismaClientManager } from "@/lib/client/PrismaClientManager";
 import { ChannelRepository } from "@/lib/repository/ChannelRepository";
 import { ChannelCreateRequest } from "@/lib/request/ChannelRequest";

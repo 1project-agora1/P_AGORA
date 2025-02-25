@@ -1,5 +1,5 @@
-import {RegisterValidator} from '@/lib/validator'
-import {ApiResponse} from '@/lib/api-response'
+import {RegisterValidator} from '@/lib/Validator'
+import {ApiResponse} from '@/lib/ApiResponse'
 import {UserRepository} from "@/lib/repository/UserRepository";
 import {PrismaClientManager} from "@/lib/client/PrismaClientManager";
 import {DuplicateUserError} from "@/lib/errors/AuthError";
