@@ -1,26 +1,17 @@
 import { ApiResponse } from "@/lib/api-response";
+import { PrismaClientManager } from "@/lib/client/PrismaClientManager";
+import { ChannelRepository } from "@/lib/repository/ChannelRepository";
+import { ChannelItemCreateRequest } from "@/lib/request/ChannelRequest";
 import { convertBigIntToString } from "@/util/ConvertBigIntToString";
-import { generateRandomToken } from "@/util/RandomToken";
-import { PrismaClient } from "@prisma/client";
-
-const prisma = new PrismaClient();
 
 export async function POST(request: Request) {
   try {
-    const data = await request.json();
-    const token = generateRandomToken();
+    const data: ChannelItemCreateRequest = await request.json();
 
-    const newChannelItem = await prisma.channelItem.create({
-      data: {
-        parent_menu_token: data.parent_menu_token,
-        parent_submenu_token: data?.parent_submenu_token,
-        submenu_name: data.submenu_name,
-        token: token,
-        updatedAt: new Date(),
-        createdAt: new Date(),
-        url: data.url,
-      },
-    });
+    const channelRepository = new ChannelRepository();
+
+    const newChannelItem = await channelRepository.createItemChannel(data);
+
     const responseData = convertBigIntToString(newChannelItem);
 
     return Response.json(
@@ -29,7 +20,7 @@ export async function POST(request: Request) {
         data: responseData,
       } as ApiResponse<typeof responseData>,
       {
-        status: 201,
+        status: 200,
       }
     );
   } catch (error) {
@@ -47,6 +38,6 @@ export async function POST(request: Request) {
       }
     );
   } finally {
-    await prisma.$disconnect();
+    await PrismaClientManager.shutdown();
   }
 }

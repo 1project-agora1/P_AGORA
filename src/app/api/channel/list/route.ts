@@ -1,28 +1,13 @@
 import { ApiResponse } from "@/lib/api-response";
+import { PrismaClientManager } from "@/lib/client/PrismaClientManager";
+import { ChannelRepository } from "@/lib/repository/ChannelRepository";
 import { convertBigIntToString } from "@/util/ConvertBigIntToString";
-import { PrismaClient } from "@prisma/client";
-
-const prisma = new PrismaClient();
 
 export async function GET() {
   try {
-    const channels = await prisma.channel.findMany({
-      select: {
-        token: true,
-        menu_name: true,
-        url: true,
-        channelItems: {
-          select: {
-            id: false,
-            parent_menu_token: true,
-            parent_submenu_token: true,
-            submenu_name: true,
-            url: true,
-            token: true,
-          },
-        },
-      },
-    });
+    const channelRepository = new ChannelRepository();
+
+    const channels = await channelRepository.getChannelList();
 
     const responseData = convertBigIntToString(channels);
 
@@ -45,6 +30,6 @@ export async function GET() {
       { status: 500 }
     );
   } finally {
-    await prisma.$disconnect();
+    await PrismaClientManager.shutdown();
   }
 }
