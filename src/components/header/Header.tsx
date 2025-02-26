@@ -1,21 +1,25 @@
 "use client";
 
+import { Channel } from "@/lib/types/ChannerType";
 import { Skeleton } from "@mui/material";
 import dynamic from "next/dynamic";
 import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { RiMenuLine } from "react-icons/ri";
-import { useChannels } from "../channel/Channel";
 import Sidebar from "../sidebar/Sidebar";
+
+interface HeaderProps {
+    channels: Channel[];
+    loading: boolean;
+}
 
 const DynamicLoginModal = dynamic(
     () => import("@/components/auth/LoginModal"),
     { ssr: false }
 );
 
-export default function Header() {
-    const { channels, loading } = useChannels();
+export default function Header({ channels, loading }: HeaderProps) {
     const [isScrolled, setIsScrolled] = useState(false);
     const [isSidebarOpen, setIsSidebarOpen] = useState(false); // 사이드바 상태 추가
     const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
@@ -52,7 +56,7 @@ export default function Header() {
     return (
         <>
             <header
-                className={`sticky p-4 top-0 z-50 transition-all duration-300 ${
+                className={`sticky py-1 px-5 top-0 z-50 transition-all duration-300 ${
                     isScrolled
                         ? "bg-transparent backdrop-blur-sm shadow-sm shadow-primaryThin"
                         : "bg-white shadow-primaryThin shadow-md"
@@ -101,7 +105,7 @@ export default function Header() {
                                     </div>
                                     {activeChannel === channel.token &&
                                         channel.channelItems && (
-                                            <div className="absolute flex flex-col  w-[100px] top-full mt-2 bg-white shadow-lg rounded-md">
+                                            <div className="absolute flex flex-col w-[100px] top-full mt-2 bg-white shadow-lg rounded-md transition-all duration-300 ease-in-out transform scale-95 origin-top">
                                                 {channel.channelItems.map(
                                                     (item) => (
                                                         <div
@@ -109,6 +113,11 @@ export default function Header() {
                                                             className="hover:text-primaryThin cursor-pointer text-nowrap text-ellipsis overflow-hidden px-4 py-2"
                                                         >
                                                             <Link
+                                                                onClick={() =>
+                                                                    setActiveChannel(
+                                                                        null
+                                                                    )
+                                                                }
                                                                 href={`${channel.url}/${item.url}`}
                                                             >
                                                                 {
@@ -144,7 +153,11 @@ export default function Header() {
                     </div>
                 </div>
             </header>
-            <Sidebar isOpen={isSidebarOpen} toggleSidebar={toggleSidebar} />
+            <Sidebar
+                channels={channels}
+                isOpen={isSidebarOpen}
+                toggleSidebar={toggleSidebar}
+            />
         </>
     );
 }
