@@ -22,6 +22,7 @@ services:
     image: mysql:8.4
     env_file: .env.${PROFILE:-local}
     container_name: P_AGORA-mysql
+    restart: always
     environment:
       MYSQL_ROOT_USERNAME: ${MYSQL_ROOT_USERNAME}
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
