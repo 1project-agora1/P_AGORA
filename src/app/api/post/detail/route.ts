@@ -3,10 +3,9 @@ import {PostRepository} from "@/lib/repository/PostRepository";
 import {ApiResponse} from "@/lib/ApiResponse";
 
 export async function GET({params}: { params: { postToken: string } }) {
+    const {postToken} = params;
     try {
         const postRepository = new PostRepository()
-        const {postToken} = params;
-
         const post = await postRepository.findPostDetail(postToken);
 
         return Response.json(
@@ -19,7 +18,7 @@ export async function GET({params}: { params: { postToken: string } }) {
             }
         );
     } catch (error) {
-        console.error("게시물 목록 조회 에러", error);
+        console.error(`게시물 조회 에러 - postToken: ${postToken}`, error);
         return Response.json(
             {
                 success: false,
