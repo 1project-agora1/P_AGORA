@@ -20,4 +20,23 @@ export class PostQuery {
             }
         })
     }
+
+    findPostDetail(postToken: string) {
+        const prisma = PrismaClientManager.getClient()
+        return prisma.post.findFirst({
+            select: {
+                title: true,        // 제목
+                content: true,      // 내용
+                user_token: true,   // 작성자 정보
+                views: true,        // 조회 수
+                likes: true,        // 좋아요 수
+                type: true,         // 프론트 페이지 구성을 위한 게시물 타입
+                createdAt: true,    // 작성 시기
+                updatedAt: true     // 수정 시기
+            },
+            where: {
+                token: postToken
+            }
+        })
+    }
 }

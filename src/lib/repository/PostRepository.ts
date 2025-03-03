@@ -12,4 +12,7 @@ export class PostRepository {
         return this.query.findPreviewList(boardToken);
     }
 
+    async findPostDetail(postToken: string) {
+        return this.query.findPostDetail(postToken);
+    }
 }
