@@ -2,11 +2,13 @@ import {ApiResponse} from "@/lib/ApiResponse";
 import {PrismaClientManager} from "@/lib/client/PrismaClientManager";
 import {PostRepository} from "@/lib/repository/PostRepository";
 
-export async function GET({params}: { params: { boardToken: string } }) {
+export async function GET(
+    request: Request,
+    {params}: { params: { boardToken: string } }
+) {
     try {
+        const {boardToken} = await params;
         const postRepository = new PostRepository()
-        const {boardToken} = params;
-
         const postList = await postRepository.findRecentPostPreList(boardToken);
 
         return Response.json(
