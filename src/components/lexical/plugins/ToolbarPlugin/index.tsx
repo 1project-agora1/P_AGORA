@@ -384,7 +384,7 @@ function ElementFormatDropdown({
             >
                 <div className="icon-text-container">
                     <i className="icon left-align" />
-                    <span className="text">좌측 정렬렬</span>
+                    <span className="text">좌측 정렬</span>
                 </div>
             </DropDownItem>
             <DropDownItem
