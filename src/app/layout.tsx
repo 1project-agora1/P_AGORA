@@ -3,7 +3,6 @@ import Header from "@/components/header/Header";
 import { ApiResponse } from "@/lib/ApiResponse";
 import { Channel } from "@/lib/types/ChannerType";
 import type { Metadata } from "next";
-import "react-quill-new/dist/quill.snow.css";
 import "./globals.css";
 
 export const metadata: Metadata = {

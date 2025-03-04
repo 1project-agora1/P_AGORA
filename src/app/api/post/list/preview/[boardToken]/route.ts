@@ -1,14 +1,14 @@
-import {ApiResponse} from "@/lib/ApiResponse";
-import {PrismaClientManager} from "@/lib/client/PrismaClientManager";
-import {PostRepository} from "@/lib/repository/PostRepository";
+import { ApiResponse } from "@/lib/ApiResponse";
+import { PrismaClientManager } from "@/lib/client/PrismaClientManager";
+import { PostRepository } from "@/lib/repository/PostRepository";
 
 export async function GET(
     request: Request,
-    {params}: { params: { boardToken: string } }
+    { params }: { params: Promise<{ boardToken: string }> }
 ) {
     try {
-        const {boardToken} = await params;
-        const postRepository = new PostRepository()
+        const { boardToken } = await params;
+        const postRepository = new PostRepository();
         const postList = await postRepository.findRecentPostPreList(boardToken);
 
         return Response.json(
@@ -27,7 +27,7 @@ export async function GET(
                 success: false,
                 error: "서버 에러",
             } as ApiResponse,
-            {status: 500}
+            { status: 500 }
         );
     } finally {
         await PrismaClientManager.shutdown();
