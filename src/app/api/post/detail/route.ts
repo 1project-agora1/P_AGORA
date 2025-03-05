@@ -1,11 +1,14 @@
-import {PrismaClientManager} from "@/lib/client/PrismaClientManager";
-import {PostRepository} from "@/lib/repository/PostRepository";
-import {ApiResponse} from "@/lib/ApiResponse";
+import { ApiResponse } from "@/lib/ApiResponse";
+import { PrismaClientManager } from "@/lib/client/PrismaClientManager";
+import { PostRepository } from "@/lib/repository/PostRepository";
 
-export async function GET({params}: { params: { postToken: string } }) {
-    const {postToken} = params;
+export async function GET(
+    req: Request,
+    { params }: { params: Promise<{ postToken: string }> }
+) {
+    const { postToken } = await params;
     try {
-        const postRepository = new PostRepository()
+        const postRepository = new PostRepository();
         const post = await postRepository.findPostDetail(postToken);
 
         return Response.json(
@@ -24,7 +27,7 @@ export async function GET({params}: { params: { postToken: string } }) {
                 success: false,
                 error: "서버 에러",
             } as ApiResponse,
-            {status: 500}
+            { status: 500 }
         );
     } finally {
         await PrismaClientManager.shutdown();
