@@ -1,4 +1,5 @@
-import {PostQuery} from "@/lib/query/PostQuery";
+import { PostQuery } from "@/lib/query/PostQuery";
+import { PostCreateRequest } from "../request/PostRequest";
 
 export class PostRepository {
     private query: PostQuery;
@@ -14,5 +15,9 @@ export class PostRepository {
 
     async findPostDetail(postToken: string) {
         return this.query.findPostDetail(postToken);
+    }
+
+    async createPost(data: PostCreateRequest) {
+        return this.query.createPost(data);
     }
 }
