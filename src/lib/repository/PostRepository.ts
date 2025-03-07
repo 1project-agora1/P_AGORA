@@ -1,18 +1,22 @@
-import {PostQuery} from "@/lib/query/PostQuery";
+import { PostQuery } from "@/lib/query/PostQuery";
 
 export class PostRepository {
-    private query: PostQuery;
+  private query: PostQuery;
 
-    constructor() {
-        this.query = new PostQuery();
-    }
+  constructor() {
+    this.query = new PostQuery();
+  }
 
-    // 최신 게시물 미리 보기 리스트 조회
-    async findRecentPostPreList(boardToken: string) {
-        return this.query.findPreviewList(boardToken);
-    }
+  // 최신 게시물 미리 보기 리스트 조회
+  async findRecentPostPreList(
+    boardToken: string,
+    page: number,
+    pageSize: number,
+  ) {
+    return this.query.findPreviewList(boardToken, page, pageSize);
+  }
 
-    async findPostDetail(postToken: string) {
-        return this.query.findPostDetail(postToken);
-    }
+  async findPostDetail(postToken: string) {
+    return this.query.findPostDetail(postToken);
+  }
 }
