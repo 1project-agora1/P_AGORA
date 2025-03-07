@@ -1,7 +1,8 @@
-import {PrismaClientManager} from "@/lib/client/PrismaClientManager";
+import { PrismaClientManager } from "@/lib/client/PrismaClientManager";
+import { generateRandomToken } from "@/util/RandomToken";
+import { PostCreateRequest } from "../request/PostRequest";
 
 export class PostQuery {
-
     async findPreviewList(boardToken: string) {
         const prisma = PrismaClientManager.getClient()
         return prisma.post.findMany({
@@ -38,5 +39,24 @@ export class PostQuery {
                 token: postToken
             }
         })
+    }
+
+    createPost(data: PostCreateRequest) {
+        const prisma = PrismaClientManager.getClient();
+        const token = generateRandomToken();
+        return prisma.post.create({
+            data: {
+                token: token,
+                title: data.title,
+                content: data.content,
+                user_token: data.user_token,
+                board_token: data.board_token,
+                type: data.type,
+                views: 0,
+                likes: 0,
+                updatedAt: new Date(),
+                createdAt: new Date(),
+            },
+        });
     }
 }
