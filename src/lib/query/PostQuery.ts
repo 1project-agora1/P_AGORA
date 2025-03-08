@@ -1,4 +1,6 @@
 import { PrismaClientManager } from "@/lib/client/PrismaClientManager";
+import { generateRandomToken } from "@/util/RandomToken";
+import { PostCreateRequest } from "../request/PostRequest";
 
 export class PostQuery {
   async findPreviewList(boardToken: string, page: number, pageSize: number) {
@@ -27,7 +29,7 @@ export class PostQuery {
         board_token: boardToken,
       },
     });
-    console.log(totalCount)
+    console.log(totalCount);
     return {
       data: paginatedResults,
       totalCount, // 총 데이터 개수 반환
@@ -50,6 +52,25 @@ export class PostQuery {
       },
       where: {
         token: postToken,
+      },
+    });
+  }
+
+  createPost(data: PostCreateRequest) {
+    const prisma = PrismaClientManager.getClient();
+    const token = generateRandomToken();
+    return prisma.post.create({
+      data: {
+        token: token,
+        title: data.title,
+        content: data.content,
+        user_token: data.user_token,
+        board_token: data.board_token,
+        type: data.type,
+        views: 0,
+        likes: 0,
+        updatedAt: new Date(),
+        createdAt: new Date(),
       },
     });
   }
