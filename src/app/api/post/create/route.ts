@@ -7,9 +7,9 @@ import { convertBigIntToString } from "@/util/ConvertBigIntToString";
 export async function POST(request: Request) {
     try {
         const data: PostCreateRequest = await request.json();
-
         const postRepository = new PostRepository();
         const newPost = await postRepository.createPost(data);
+        console.log(newPost);
         const responseData = convertBigIntToString(newPost);
 
         return Response.json(

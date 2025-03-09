@@ -25,4 +25,8 @@ export class ChannelRepository {
     async createChannel(request: ChannelCreateRequest) {
         return await this.query.createChannel(request);
     }
+
+    async getChannel(channelToken: string, itemToken: string) {
+        return await this.query.getChannel(channelToken, itemToken);
+    }
 }

@@ -41,6 +41,7 @@
         "katex": "^0.16.21",
         "lexical": "^0.26.0",
         "next": "15.1.6",
+        "next-client-cookies": "^2.0.1",
         "prettier": "^3.4.2",
         "react": "^19.0.0",
         "react-dom": "^19.0.0",

@@ -42,13 +42,12 @@ enum UserRole {
 model Post {
   id          BigInt   @id @default(autoincrement())
   token       String   @unique // 게시판 글 토큰
-  board_token String   @unique
+  board_token String  
   title       String
-  content     String? // 선택 사항
+  content     String   @db.Text
   user_token  String // 유저 테이블 매핑을 위한 FK
   views       Int      @default(0)
   likes       Int      @default(0)
-  type        PostType // TODO: PostType 검토 필요
   createdAt   DateTime @default(now()) @map("created_at")
   updatedAt   DateTime @updatedAt @map("updated_at")
 
