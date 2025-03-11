@@ -11,8 +11,11 @@ export async function POST(request: Request) {
             email,
             password
         );
-
-        await userRepository.setCookie("token", user);
+        const ACCESS_TOKEN = process.env.NEXT_PUBLIC_ACCESS_TOKEN;
+        if (!ACCESS_TOKEN) {
+            throw new Error("환경변수를 확인해주세요.");
+        }
+        await userRepository.setCookie(ACCESS_TOKEN, user);
 
         return Response.json(
             {

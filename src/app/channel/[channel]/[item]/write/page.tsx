@@ -2,15 +2,16 @@
 
 import ErrorDisplay from "@/components/ErrorDisplay";
 import Editor from "@/components/lexical/Editor";
+import { pathDivided } from "@/util/PathDivider";
 import { Skeleton } from "@mui/material";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 
 export default function WritePage() {
     const pathname = usePathname();
-    const segments = pathname.split("/");
-    const channel = segments[2];
-    const item = segments[3];
+    const { item3, item4 } = pathDivided(pathname);
+    const channel = item3;
+    const item = item4;
     const [category, setCategory] = useState<any>();
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);

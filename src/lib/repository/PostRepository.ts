@@ -1,4 +1,5 @@
 import { PostQuery } from "@/lib/query/PostQuery";
+import { convertBigIntToString } from "@/util/ConvertBigIntToString";
 import { PostCreateRequest } from "../request/PostRequest";
 
 export class PostRepository {
@@ -18,6 +19,10 @@ export class PostRepository {
     }
 
     async createPost(data: PostCreateRequest) {
-        return this.query.createPost(data);
+        const response = await this.query.createPost(data);
+        if (response == null) {
+            return null;
+        }
+        return convertBigIntToString(response);
     }
 }
