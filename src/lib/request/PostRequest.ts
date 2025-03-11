@@ -4,3 +4,9 @@ export interface PostCreateRequest {
     content: string;
     user_token: string;
 }
+
+export interface PostPreviewRequest {
+    boardToken: string;
+    page: number;
+    pageSize: number;
+}
