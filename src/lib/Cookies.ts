@@ -1,24 +1,25 @@
-import {cookies} from "next/headers";
 import jwt from "jsonwebtoken";
+import { cookies } from "next/headers";
+import { UserType } from "./types/UserType";
 
 // 쿠키 설정
-export async function setCookie(cookieName: string, nickname: string, email: string) {
+export async function setCookie(cookieName: string, user: UserType) {
     const cookie = await cookies();
 
     // JWT 생성
     const token = jwt.sign(
-        {nickname: nickname, email: email},
+        { nickname: user.nickname, email: user.email, token: user.token },
         process.env.JWT_SECRET!,
-        {expiresIn: '1h'}
-    )
+        { expiresIn: "1h" }
+    );
 
     cookie.set(cookieName, token, {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === 'production',
-        sameSite: 'strict',
+        // httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        // sameSite: "strict",
         maxAge: 60 * 60,
-        path: '/',
-    })
+        path: "/",
+    });
 
     return cookie;
 }
@@ -26,5 +27,5 @@ export async function setCookie(cookieName: string, nickname: string, email: str
 // 쿠키 삭제
 export async function deleteCookie(cookieName: string) {
     const cookie = await cookies();
-    cookie.delete(cookieName)
+    cookie.delete(cookieName);
 }

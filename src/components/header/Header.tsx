@@ -118,7 +118,7 @@ export default function Header({ channels, loading }: HeaderProps) {
                                                                         null
                                                                     )
                                                                 }
-                                                                href={`${channel.url}/${item.url}`}
+                                                                href={`/channel/${channel.token}/${item.token}`}
                                                             >
                                                                 {
                                                                     item.submenu_name

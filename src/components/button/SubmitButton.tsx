@@ -1,17 +1,20 @@
 import Button from "@mui/material/Button";
 
 interface SubmitButtonProps {
-    onClick: () => void;
+    onClick?: () => void;
     buttonName: string;
+    style?: string;
 }
 
 export default function SubmitButton({
     onClick,
     buttonName,
+    style,
 }: SubmitButtonProps) {
     return (
-        <div className="flex items-center justify-end mt-10 ">
+        <div className={`flex items-center justify-end mt-2 ${style}`}>
             <Button
+                type="submit"
                 onClick={onClick}
                 variant="contained"
                 sx={{

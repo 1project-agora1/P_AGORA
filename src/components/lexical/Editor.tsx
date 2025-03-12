@@ -1,6 +1,7 @@
 "use strict";
 import type { JSX } from "react";
 
+import { useUser } from "@/hooks/useUser";
 import { CodeNode } from "@lexical/code";
 import { LinkNode } from "@lexical/link";
 import { ListItemNode, ListNode } from "@lexical/list";
@@ -52,11 +53,17 @@ const editorConfig = {
     ],
 };
 
-export default function Editor(): JSX.Element {
+export default function Editor({
+    item,
+    channel,
+}: {
+    item: string;
+    channel: string;
+}): JSX.Element {
     return (
         <LexicalComposer initialConfig={editorConfig}>
             <ToolbarContext>
-                <LexicalEditor />
+                <LexicalEditor item={item} channel={channel} />
             </ToolbarContext>
         </LexicalComposer>
     );
@@ -70,7 +77,14 @@ interface UseSettings {
     settings: Settings;
 }
 
-function LexicalEditor(): JSX.Element {
+function LexicalEditor({
+    item,
+    channel,
+}: {
+    item: string;
+    channel: string;
+}): JSX.Element {
+    const { user } = useUser();
     const {
         settings: { hasLinkAttributes },
     }: UseSettings = useSettings();
@@ -83,13 +97,15 @@ function LexicalEditor(): JSX.Element {
     const [editor] = useLexicalComposerContext();
     const [activeEditor, setActiveEditor] = useState(editor);
     const [isLinkEditMode, setIsLinkEditMode] = useState<boolean>(false);
-
+    const [title, setTitle] = useState<string>("");
     const onRef = (_floatingAnchorElem: HTMLDivElement) => {
         if (_floatingAnchorElem !== null) {
             setFloatingAnchorElem(_floatingAnchorElem);
         }
     };
-
+    const handleTitleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        setTitle(e.target.value);
+    };
     useEffect(() => {
         const updateViewPortWidth = () => {
             const isNextSmallWidthViewport =
@@ -106,54 +122,91 @@ function LexicalEditor(): JSX.Element {
             window.removeEventListener("resize", updateViewPortWidth);
         };
     }, [isSmallWidthViewport]);
-    const saveContent = async () => {
+    const saveContent = async (e: any) => {
+        e.preventDefault();
         const editorState = editor.getEditorState();
+
         const content = JSON.stringify(editorState.toJSON());
         //TODO : 게시판 저장 로직 추가
-        console.log(content);
+        console.log(content.length);
+        console.log(title);
+        console.log(user.token);
+        console.log(item);
+        await fetch("/api/post/create", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+                board_token: item,
+                title: title,
+                content: content,
+                user_token: user?.token,
+            }),
+        }).then((res) => {
+            if (res.ok) {
+                alert("게시글이 성공적으로 저장되었습니다.");
+                window.location.href = `/channel/${channel}/${item}`;
+            } else {
+                alert("게시글 저장에 실패하였습니다.");
+            }
+        });
     };
     return (
-        <>
+        <form onSubmit={saveContent}>
+            <div className="w-full border-b-2 border-gray-200 mb-4">
+                <label htmlFor="title">제목</label>
+                <input
+                    onChange={handleTitleChange}
+                    className="w-full text-lg px-2"
+                    type="text"
+                    name="title"
+                    required
+                    id=""
+                />
+            </div>
+            <input type="hidden" name="userToken" value={user.token} />
             <ToolbarPlugin
                 editor={editor}
                 activeEditor={activeEditor}
                 setActiveEditor={setActiveEditor}
                 setIsLinkEditMode={setIsLinkEditMode}
             />
-            <SelectionAlwaysOnDisplay />
-            <ClearEditorPlugin />
-            <RichTextPlugin
-                contentEditable={
-                    <div className="editor-scroller">
-                        <div className="editor" ref={onRef}>
-                            <ContentEditable
-                                placeholder={"내용을 입력하세요..."}
-                            />
+            <div className="bg-gray-50 shadow-xl">
+                <SelectionAlwaysOnDisplay />
+                <ClearEditorPlugin />
+                <RichTextPlugin
+                    contentEditable={
+                        <div className="editor-scroller">
+                            <div className="editor" ref={onRef}>
+                                <ContentEditable
+                                    placeholder={"내용을 입력하세요..."}
+                                />
+                            </div>
                         </div>
-                    </div>
-                }
-                ErrorBoundary={LexicalErrorBoundary}
-            />
-            {floatingAnchorElem && !isSmallWidthViewport && (
-                <>
-                    <DraggableBlockPlugin anchorElem={floatingAnchorElem} />
-                    <FloatingLinkEditorPlugin
-                        anchorElem={floatingAnchorElem}
-                        isLinkEditMode={isLinkEditMode}
-                        setIsLinkEditMode={setIsLinkEditMode}
-                    />
-                </>
-            )}
-            <LinkPlugin />
-            <CheckListPlugin />
-            <ImagesPlugin />
-            <InlineImagePlugin />
-            <ListPlugin />
-            <ClickableLinkPlugin disabled={isEditable} />
-            <HorizontalRulePlugin />
-            <TabIndentationPlugin maxIndent={7} />
-
-            <SubmitButton buttonName="저장하기" onClick={saveContent} />
-        </>
+                    }
+                    ErrorBoundary={LexicalErrorBoundary}
+                />
+                {floatingAnchorElem && !isSmallWidthViewport && (
+                    <>
+                        <DraggableBlockPlugin anchorElem={floatingAnchorElem} />
+                        <FloatingLinkEditorPlugin
+                            anchorElem={floatingAnchorElem}
+                            isLinkEditMode={isLinkEditMode}
+                            setIsLinkEditMode={setIsLinkEditMode}
+                        />
+                    </>
+                )}
+                <LinkPlugin />
+                <CheckListPlugin />
+                <ImagesPlugin />
+                <InlineImagePlugin />
+                <ListPlugin />
+                <ClickableLinkPlugin disabled={isEditable} />
+                <HorizontalRulePlugin />
+                <TabIndentationPlugin maxIndent={7} />
+            </div>
+            <SubmitButton style="mb-2" buttonName="저장하기" />
+        </form>
     );
 }
