@@ -1,15 +1,35 @@
 "use client";
 
+import {useEffect, useState} from "react";
+import {Post} from "@prisma/client";
+import {Skeleton} from "@mui/material";
 import ErrorDisplay from "@/components/ErrorDisplay";
-import { ApiResponse } from "@/lib/ApiResponse";
-import { DocumentIcon, EyeIcon, HeartIcon } from "@heroicons/react/24/outline";
-import { Skeleton } from "@mui/material";
-import { Post } from "@prisma/client";
-import Link from "next/link";
-import { useEffect, useState } from "react";
+import {ApiResponse} from "@/lib/ApiResponse";
+import {DocumentIcon, EyeIcon, HeartIcon} from "@heroicons/react/24/outline";
+import {PostListResponse} from "@/lib/response/PostResponse";
 
-export function PostListForm({ boardToken }: { boardToken: string }) {
+interface BoardData {
+    token: string;
+}
+
+export function PostListForm({boards}: { boards: BoardData[] }) {
+    return (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 p-4">
+            {boards.map((board) => (
+                <BoardSection
+                    key={board.token}
+                    boardToken={board.token}
+                />
+            ))}
+        </div>
+    );
+}
+
+function BoardSection({boardToken}: {
+    boardToken: string;
+}) {
     const [posts, setPosts] = useState<Post[]>([]);
+    const [boardName, setBoardName] = useState('');
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
 
@@ -20,29 +40,29 @@ export function PostListForm({ boardToken }: { boardToken: string }) {
                     throw new Error("유효하지 않은 게시판 토큰");
                 }
 
-                const response = await fetch(
-                    `/api/post/list/preview/${boardToken}`,
-                    {
-                        next: { revalidate: 60 }, // 60초 캐싱
-                    }
-                );
-
-                if (!response.ok) {
-                    throw new Error(`HTTP ${response.status}`);
+                const resPost = await fetch(`/api/post/list/preview/${boardToken}`);
+                if (!resPost.ok) {
+                    throw new Error(`HTTP ${resPost.status}`);
                 }
 
-                const contentType = response.headers.get("content-type");
+                const contentType = resPost.headers.get("content-type");
                 if (!contentType?.includes("application/json")) {
                     throw new Error("유효하지 않은 응답 형식");
                 }
 
-                const result: ApiResponse<Post[]> = await response.json();
-
+                const result: ApiResponse<PostListResponse> = await resPost.json();
                 if (!result.success || !result.data) {
                     throw new Error(result.error || "데이터 불러오기 실패");
                 }
 
-                setPosts(result.data);
+                const resBoardName = await fetch(`/api/board/name/${boardToken}`);
+                const { data } = await resBoardName.json();
+                if (!data) {
+                    throw new Error("게시판 이름 불러오기 실패")
+                }
+
+                setPosts(result.data.posts)
+                setBoardName(data.name)
 
                 setError(null);
             } catch (err) {
@@ -58,69 +78,52 @@ export function PostListForm({ boardToken }: { boardToken: string }) {
         fetchPreviewData();
     }, [boardToken]);
 
-    if (loading) {
-        return (
-            <div className="space-y-4">
-                <Skeleton className="h-8 w-full" />
-                <Skeleton className="h-8 w-3/4" />
-                <Skeleton className="h-8 w-2/3" />
-            </div>
-        );
-    }
-
-    if (error) {
-        return (
-            <ErrorDisplay
-                title="데이터 로딩 실패"
-                message={error}
-                retryFn={() => window.location.reload()}
-            />
-        );
-    }
-
     return (
-        <div className="space-y-6 font-custom">
-            {posts.length === 0 ? (
-                <div className="text-center py-12">
-                    <div className="mx-auto mb-4 text-primaryThin">
-                        <DocumentIcon className="w-12 h-12 inline-block" />
-                    </div>
-                    <p className="text-primaryThin font-medium">
-                        등록된 게시글이 없습니다
-                    </p>
+        <div className="bg-white rounded-xl p-4 shadow-sm border border-gray-100">
+            <h3 className="text-lg font-semibold mb-3 text-gray-700">{boardName}</h3>
+
+            {loading ? (
+                <div className="space-y-2">
+                    {[1, 2, 3].map((i) => (
+                        <Skeleton key={i} className="h-10 rounded-md"/>
+                    ))}
+                </div>
+            ) : error ? (
+                <ErrorDisplay
+                    title="데이터 로딩 실패"
+                    message={error}
+                    retryFn={() => window.location.reload()}
+                />
+            ) : posts.length === 0 ? (
+                <div className="text-center py-3">
+                    <DocumentIcon className="w-7 h-7 mx-auto text-gray-400"/>
+                    <p className="text-gray-500 text-xs mt-1.5">게시글이 없습니다</p>
                 </div>
             ) : (
-                posts.map((post) => (
-                    <article
-                        key={post.token}
-                        className="p-6 border-2 border-primaryThin rounded-xl
-                        hover:shadow-lg transition-all duration-300
-                        bg-white/90 backdrop-blur-sm"
-                    >
-                        <Link href={`${boardToken}/${post.token}`}>
-                            <div className="flex justify-between items-center gap-4">
-                                <h2 className="text-xl font-bold text-primary truncate">
+                <div className="space-y-2">
+                    {posts.map((post) => (
+                        <article
+                            key={post.token}
+                            className="p-2 border border-gray-200 rounded-md hover:bg-gray-50 transition-colors cursor-pointer"
+                        >
+                            <div className="flex justify-between items-center">
+                                <h4 className="text-sm truncate font-medium text-gray-800">
                                     {post.title}
-                                </h2>
-
-                                <div className="flex gap-4 shrink-0">
-                                    <div className="flex items-center gap-1 text-primary">
-                                        <EyeIcon className="w-5 h-5" />
-                                        <span className="text-sm font-medium">
-                                            {post.views}
-                                        </span>
+                                </h4>
+                                <div className="flex gap-1.5">
+                                    <div className="flex items-center gap-1 text-gray-500">
+                                        <EyeIcon className="w-3.5 h-3.5"/>
+                                        <span className="text-[11px]">{post.views}</span>
                                     </div>
-                                    <div className="flex items-center gap-1 text-primary">
-                                        <HeartIcon className="w-5 h-5" />
-                                        <span className="text-sm font-medium">
-                                            {post.likes}
-                                        </span>
+                                    <div className="flex items-center gap-1 text-gray-500">
+                                        <HeartIcon className="w-3.5 h-3.5"/>
+                                        <span className="text-[11px]">{post.likes}</span>
                                     </div>
                                 </div>
                             </div>
-                        </Link>
-                    </article>
-                ))
+                        </article>
+                    ))}
+                </div>
             )}
         </div>
     );
