@@ -1,7 +1,6 @@
 import { ApiResponse } from "@/lib/ApiResponse";
 import { PrismaClientManager } from "@/lib/client/PrismaClientManager";
 import { ChannelRepository } from "@/lib/repository/ChannelRepository";
-import { convertBigIntToString } from "@/util/ConvertBigIntToString";
 import { NextRequest } from "next/server";
 
 export async function GET(request: NextRequest) {
@@ -34,13 +33,13 @@ export async function GET(request: NextRequest) {
                 { status: 200 }
             );
         }
-        const responseData = convertBigIntToString(channels);
 
         return Response.json(
             {
                 success: true,
-                data: responseData,
-            } as ApiResponse<typeof responseData>,
+                data: channels,
+            } as ApiResponse<typeof channels>,
+
             {
                 status: 200,
             }

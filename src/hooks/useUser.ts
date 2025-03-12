@@ -13,7 +13,13 @@ export const useUser = () => {
     });
 
     useEffect(() => {
-        const token = cookies.get("token"); // httpOnly 쿠키도 읽을 수 있음
+        const userToken = process.env.NEXT_PUBLIC_ACCESS_TOKEN;
+        if (!userToken) {
+            console.error("환경변수를 확인해주세요.");
+            return;
+        }
+        const token = cookies.get(userToken); // httpOnly 쿠키도 읽을 수 있음
+
         if (token) {
             try {
                 const decoded = jwt.decode(token) as UserType; // 🔹 클라이언트에서는 검증하지 않고 decode만!

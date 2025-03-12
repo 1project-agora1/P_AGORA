@@ -49,3 +49,6 @@ package-lock.json
 
 # local files
 /uploaded/
+
+#prisma
+/prisma/migrations/

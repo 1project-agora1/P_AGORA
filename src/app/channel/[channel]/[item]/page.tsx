@@ -1,16 +1,26 @@
 "use client";
 
+import SubmitButton from "@/components/button/SubmitButton";
+import { PostListForm } from "@/components/post/PostListForm";
+import { pathDivided } from "@/util/PathDivider";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
 export default function Channel() {
     const pathname = usePathname();
-    const segments = pathname.split("/");
-    const channel = segments[2];
-    const item = segments[3];
+    const { item3, item4 } = pathDivided(pathname);
+    const channel = item3;
+    const item = item4;
+
+
     return (
         <div>
-            <Link href={`/channel/${channel}/${item}/write`}>글쓰기</Link>
+            <div className="my-5">
+                <PostListForm boardToken={item} />
+            </div>
+            <Link href={`/channel/${channel}/${item}/write`}>
+                <SubmitButton buttonName="글쓰기" />
+            </Link>
         </div>
     );
 }
