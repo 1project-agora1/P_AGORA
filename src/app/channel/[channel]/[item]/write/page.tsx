@@ -56,6 +56,7 @@ export default function WritePage() {
             />
         );
     }
+
     return (
         <>
             <div className="mt-10 text-lg font-bold">

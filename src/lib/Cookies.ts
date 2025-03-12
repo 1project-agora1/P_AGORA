@@ -10,6 +10,7 @@ export async function setCookie(cookieName: string, user: UserType) {
     const token = jwt.sign(
         { nickname: user.nickname, email: user.email, token: user.token },
         process.env.NEXT_PUBLIC_ACCESS_TOKEN!,
+
         { expiresIn: "1h" }
     );
 

@@ -9,6 +9,7 @@ export async function POST(request: Request) {
         const postRepository = new PostRepository();
         const newPost = await postRepository.createPost(data);
 
+
         return Response.json(
             {
                 success: true,

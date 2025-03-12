@@ -19,6 +19,7 @@ export const useUser = () => {
             return;
         }
         const token = cookies.get(userToken); // httpOnly 쿠키도 읽을 수 있음
+
         if (token) {
             try {
                 const decoded = jwt.decode(token) as UserType; // 🔹 클라이언트에서는 검증하지 않고 decode만!
