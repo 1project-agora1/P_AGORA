@@ -28,7 +28,7 @@ export class PostQuery {
         board_token: boardToken,
       },
     });
-    console.log(totalCount);
+
     return {
       data: paginatedResults,
       totalCount, // 총 데이터 개수 반환
