@@ -5,7 +5,7 @@ export async function POST() {
     try {
         const userRepository = new UserRepository()
         // 액세스 토큰 쿠키 삭제
-        await userRepository.deleteCookie(process.env.ACCESS_TOKEN!)
+        await userRepository.deleteCookie(process.env.NEXT_PUBLIC_ACCESS_TOKEN!)
 
         return Response.json({
             success: true
