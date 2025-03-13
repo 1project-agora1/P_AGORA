@@ -5,8 +5,10 @@ import {Post} from "@prisma/client";
 import {Skeleton} from "@mui/material";
 import ErrorDisplay from "@/components/ErrorDisplay";
 import {ApiResponse} from "@/lib/ApiResponse";
-import {DocumentIcon, EyeIcon, HeartIcon} from "@heroicons/react/24/outline";
+import {ClockIcon, DocumentIcon, EyeIcon, HeartIcon} from "@heroicons/react/24/outline";
 import {PostListResponse} from "@/lib/response/PostResponse";
+import {formatDistanceToNow} from "date-fns";
+import {ko} from "date-fns/locale";
 
 interface BoardData {
     token: string;
@@ -56,7 +58,7 @@ function BoardSection({boardToken}: {
                 }
 
                 const resBoardName = await fetch(`/api/board/name/${boardToken}`);
-                const { data } = await resBoardName.json();
+                const {data} = await resBoardName.json();
                 if (!data) {
                     throw new Error("게시판 이름 불러오기 실패")
                 }
@@ -79,7 +81,7 @@ function BoardSection({boardToken}: {
     }, [boardToken]);
 
     return (
-        <div className="bg-white rounded-xl p-4 shadow-sm border border-gray-100">
+        <div className="bg-white rounded-xl p-2 shadow-sm border border-gray-150">
             <h3 className="text-lg font-semibold mb-3 text-gray-700">{boardName}</h3>
 
             {loading ? (
@@ -111,13 +113,27 @@ function BoardSection({boardToken}: {
                                     {post.title}
                                 </h4>
                                 <div className="flex gap-1.5">
+                                    {/* 조회수 영역 */}
                                     <div className="flex items-center gap-1 text-gray-500">
                                         <EyeIcon className="w-3.5 h-3.5"/>
                                         <span className="text-[11px]">{post.views}</span>
                                     </div>
+
+                                    {/* 좋아요 영역 */}
                                     <div className="flex items-center gap-1 text-gray-500">
                                         <HeartIcon className="w-3.5 h-3.5"/>
                                         <span className="text-[11px]">{post.likes}</span>
+                                    </div>
+
+                                    {/* 시간 표시 영역 */}
+                                    <div className="flex items-center gap-1 text-gray-500">
+                                        <ClockIcon className="w-3.5 h-3.5"/>
+                                        <span className="text-[11px]">
+                                            {formatDistanceToNow(new Date(post.createdAt), {
+                                                addSuffix: true,
+                                                locale: ko
+                                            })}
+                                        </span>
                                     </div>
                                 </div>
                             </div>
