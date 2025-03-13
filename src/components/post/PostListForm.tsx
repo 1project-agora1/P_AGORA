@@ -34,6 +34,7 @@ function BoardSection({boardToken}: {
     const [boardName, setBoardName] = useState('');
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
+    const SKELETON_ITEMS = Array(3).fill(null)     // TODO: 메인 화면 설정 시 검토 필요
 
     useEffect(() => {
         const fetchPreviewData = async () => {
@@ -86,8 +87,8 @@ function BoardSection({boardToken}: {
 
             {loading ? (
                 <div className="space-y-2">
-                    {[1, 2, 3].map((i) => (
-                        <Skeleton key={i} className="h-10 rounded-md"/>
+                    {SKELETON_ITEMS.map((_, i) => (
+                        <Skeleton key={`skeleton-${i}`} className="h-10 rounded-md"/>
                     ))}
                 </div>
             ) : error ? (
@@ -106,7 +107,8 @@ function BoardSection({boardToken}: {
                     {posts.map((post) => (
                         <article
                             key={post.token}
-                            className="p-2 border border-gray-200 rounded-md hover:bg-gray-50 transition-colors cursor-pointer"
+                            className="p-2 border border-gray-200 rounded-md
+                            hover:bg-gray-50 transition-colors cursor-pointer"
                         >
                             <div className="flex justify-between items-center">
                                 <h4 className="text-sm truncate font-medium text-gray-800">
