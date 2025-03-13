@@ -6,7 +6,7 @@ export async function GET(
     req: Request,
     {params}: { params: { token: string } }
 ) {
-    const {token: boardToken} = await params;
+    const {token: boardToken} = params;
     try {
         const boardRepository = new BoardRepository();
         const board = await boardRepository.findBoardName(boardToken);
