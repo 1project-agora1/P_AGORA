@@ -1,15 +1,32 @@
 'use client'
 
-import { usePathname } from "next/navigation"
-import {PostListForm} from "@/components/post/PostListForm";
+import {useEffect, useState} from "react"
+import {usePathname} from "next/navigation"
+import {PostListForm} from "@/components/post/PostListForm"
+import {pathDivided} from "@/util/PathDivider"
+
+interface BoardData {
+    token: string
+}
 
 export default function PostList() {
     const pathname = usePathname()
+    const [boardData, setBoardData] = useState<BoardData[]>([])
+    const [loading, setLoading] = useState(true)
 
-    if(!pathname) return <div>Loading...</div>
+    useEffect(() => {
+        if (!pathname) return
 
-    const segments = pathname.split("/")
-    const boardToken = segments[4]
+        const {item5} = pathDivided(pathname)
+        setBoardData([{
+            token: item5
+        }])
+        setLoading(false)
+    }, [pathname])
 
-    return <PostListForm boardToken={boardToken} />
+    if (!pathname || loading) {
+        return <div className="p-4">로딩 중...</div>
+    }
+
+    return <PostListForm boards={boardData}/>
 }

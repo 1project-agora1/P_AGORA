@@ -1,16 +1,17 @@
-import { PrismaClientManager } from "@/lib/client/PrismaClientManager";
-import { generateRandomToken } from "@/util/RandomToken";
-import { PostCreateRequest } from "../request/PostRequest";
+import {PrismaClientManager} from "@/lib/client/PrismaClientManager";
+import {generateRandomToken} from "@/util/RandomToken";
+import {PostCreateRequest} from "../request/PostRequest";
 
 export class PostQuery {
-    async findPreviewList(boardToken: string) {
+    async findPreviewList(boardToken: string, page: number, pageSize: number) {
         const prisma = PrismaClientManager.getClient();
-        return prisma.post.findMany({
+        const paginatedResults = await prisma.post.findMany({
             select: {
-                token: true, // 상세 조회 넘어가기 위한 토큰
-                title: true, // 미리 보기 리스트에서 보여줄 항목
-                views: true, // 미리 보기 리스트에서 보여줄 항목
-                likes: true, // 미리 보기 리스트에서 보여줄 항목
+                token: true,        // 상세 조회 넘어가기 위한 토큰
+                title: true,        // 미리 보기 리스트에서 보여줄 항목
+                views: true,        // 미리 보기 리스트에서 보여줄 항목
+                likes: true,        // 미리 보기 리스트에서 보여줄 항목
+                createdAt: true,    // 게시물 생성 시간
             },
             where: {
                 board_token: boardToken,
@@ -18,7 +19,22 @@ export class PostQuery {
             orderBy: {
                 createdAt: "desc", // 최신순 정렬
             },
+            skip: (page - 1) * pageSize, // 이전 페이지 데이터 스킵
+            take: pageSize, // 현재 페이지 데이터 가져오기
         });
+
+        // 총 데이터 개수 계산
+        const totalCount = await prisma.post.count({
+            where: {
+                board_token: boardToken,
+            },
+        });
+
+        return {
+            data: paginatedResults,
+            totalCount, // 총 데이터 개수 반환
+            totalPages: Math.ceil(totalCount / pageSize), // 총 페이지 수 계산
+        };
     }
 
     findPostDetail(postToken: string) {
