@@ -40,19 +40,20 @@ enum UserRole {
 // ---------------------------------------------------------------------------------------------------------------------
 // Post
 model Post {
-  id          BigInt   @id @default(autoincrement())
-  token       String   @unique // 게시판 글 토큰
-  board_token String  
-  title       String
-  content     String   @db.Text
-  user_token  String // 유저 테이블 매핑을 위한 FK
-  views       Int      @default(0)
-  likes       Int      @default(0)
-  createdAt   DateTime @default(now()) @map("created_at")
-  updatedAt   DateTime @updatedAt @map("updated_at")
+  id                 BigInt   @id @default(autoincrement())
+  token              String   @unique // 게시판 글 토큰
+  channel_item_token String
+  title              String
+  content            String   @db.Text
+  user_token         String // 유저 테이블 매핑을 위한 FK
+  views              Int      @default(0)
+  likes              Int      @default(0)
+  createdAt          DateTime @default(now()) @map("created_at")
+  updatedAt          DateTime @updatedAt @map("updated_at")
 
   // mapping - FK : user_token
   user User @relation(fields: [user_token], references: [token])
+  channel_item ChannelItem @relation(fields: [channel_item_token], references: [token])
 
   @@map("post")
 }
@@ -62,21 +63,6 @@ enum PostType {
   TEXT_ONLY // 글자만
   MEDIA_ONLY // 미디어만
   TEXT_MEDIA // 글자, 미디어 둘 다 존재
-}
-
-// ---------------------------------------------------------------------------------------------------------------------
-// Board
-model Board {
-  id          BigInt      @id @default(autoincrement())
-  token       String      @unique @db.VarChar(255)
-  menu_token  String      @unique
-  channelItem ChannelItem @relation(fields: [menu_token], references: [token])
-  board_name  String      @unique @db.VarChar(255)
-  description String?     @db.Text
-  created_at  DateTime    @default(now())
-  updated_at  DateTime    @updatedAt
-
-  @@map("board")
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -112,7 +98,7 @@ model ChannelItem {
   // mapping - FK : parent_submenu_token
   parent   ChannelItem?  @relation("ParentSubmenu", fields: [parent_submenu_token], references: [token])
   children ChannelItem[] @relation("ParentSubmenu")
-  Board    Board?
 
   @@map("channel_item")
+  Post Post[]
 }
