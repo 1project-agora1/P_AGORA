@@ -1,16 +1,16 @@
 import {ApiResponse} from "@/lib/ApiResponse";
 import {PrismaClientManager} from "@/lib/client/PrismaClientManager";
-import {BoardRepository} from "@/lib/repository/BoardRepository";
+import {ChannelItemRepository} from "@/lib/repository/ChannelItemRepository";
 
 export async function GET(
     req: Request,
     {params}: { params: { token: string } }
 ) {
-    const {token: boardToken} = params;
+    const {token: channelItemToken} = params;
     try {
-        const boardRepository = new BoardRepository();
-        const board = await boardRepository.findBoardName(boardToken);
-        if (!board) {
+        const channelItemRepository = new ChannelItemRepository();
+        const channelItem = await channelItemRepository.findChannelItemName(channelItemToken);
+        if (!channelItem) {
             return Response.json(
                 {
                     success: false,
@@ -23,14 +23,14 @@ export async function GET(
         return Response.json(
             {
                 success: true,
-                data: {name: board.board_name},
+                data: {name: channelItem.submenu_name},
             } as ApiResponse<{ name: string }>,
             {
                 status: 200,
             }
         );
     } catch (error) {
-        console.error(`게시판 이름 조회 에러 - boardToken : ${boardToken}`, error);
+        console.error(`게시판 이름 조회 에러 - boardToken : ${channelItemToken}`, error);
         return Response.json(
             {
                 success: false,

@@ -138,7 +138,7 @@ function LexicalEditor({
                 "Content-Type": "application/json",
             },
             body: JSON.stringify({
-                board_token: item,
+                channel_item_token: item,
                 title: title,
                 content: content,
                 user_token: user?.token,
