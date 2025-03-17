@@ -5,20 +5,20 @@ import {usePathname} from "next/navigation"
 import {PostListForm} from "@/components/post/PostListForm"
 import {pathDivided} from "@/util/PathDivider"
 
-interface BoardData {
+interface ChannelItemData {
     token: string
 }
 
 export default function PostList() {
     const pathname = usePathname()
-    const [boardData, setBoardData] = useState<BoardData[]>([])
+    const [channelItemData, setChannelItemData] = useState<ChannelItemData[]>([])
     const [loading, setLoading] = useState(true)
 
     useEffect(() => {
         if (!pathname) return
 
         const {item5} = pathDivided(pathname)
-        setBoardData([{
+        setChannelItemData([{
             token: item5
         }])
         setLoading(false)
@@ -28,5 +28,5 @@ export default function PostList() {
         return <div className="p-4">로딩 중...</div>
     }
 
-    return <PostListForm boards={boardData}/>
+    return <PostListForm channelItems={channelItemData}/>
 }

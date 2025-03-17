@@ -6,10 +6,10 @@ import {PostListResponse} from "@/lib/response/PostResponse";
 
 export async function GET(
     request: Request,
-    {params}: { params: Promise<{ boardToken: string }> },
+    {params}: { params: Promise<{ token: string }> },
 ) {
     try {
-        const {boardToken} = await params;
+        const {token} = await params;
         // URL에서 쿼리 파라미터 추출
         const url = new URL(request.url);
         const page = parseInt(url.searchParams.get("page") || "1", 10); // 기본값 1
@@ -18,7 +18,7 @@ export async function GET(
         // 파라미터 객체 생성
         // TODO: 매퍼 사용?
         const searchParams: PostPreviewRequest = {
-            boardToken: boardToken,
+            channel_item_token: token,
             page,
             pageSize,
         };

@@ -10,28 +10,28 @@ import {PostListResponse} from "@/lib/response/PostResponse";
 import {formatDistanceToNow} from "date-fns";
 import {ko} from "date-fns/locale";
 
-interface BoardData {
+interface ChannelItemData {
     token: string;
 }
 
-export function PostListForm({boards}: { boards: BoardData[] }) {
+export function PostListForm({channelItems}: { channelItems: ChannelItemData[] }) {
     return (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 p-4">
-            {boards.map((board) => (
-                <BoardSection
-                    key={board.token}
-                    boardToken={board.token}
+            {channelItems.map((channelItem) => (
+                <ChannelItemSection
+                    key={channelItem.token}
+                    token={channelItem.token}
                 />
             ))}
         </div>
     );
 }
 
-function BoardSection({boardToken}: {
-    boardToken: string;
+function ChannelItemSection({token}: {
+    token: string;
 }) {
     const [posts, setPosts] = useState<Post[]>([]);
-    const [boardName, setBoardName] = useState('');
+    const [channelItemName, setChannelItemName] = useState('');
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
     const SKELETON_ITEMS = Array(3).fill(null)     // TODO: 메인 화면 설정 시 검토 필요
@@ -39,11 +39,11 @@ function BoardSection({boardToken}: {
     useEffect(() => {
         const fetchPreviewData = async () => {
             try {
-                if (!boardToken) {
+                if (!token) {
                     throw new Error("유효하지 않은 게시판 토큰");
                 }
 
-                const resPost = await fetch(`/api/post/list/preview/${boardToken}`);
+                const resPost = await fetch(`/api/post/list/preview/${token}`);
                 if (!resPost.ok) {
                     throw new Error(`HTTP ${resPost.status}`);
                 }
@@ -58,14 +58,14 @@ function BoardSection({boardToken}: {
                     throw new Error(result.error || "데이터 불러오기 실패");
                 }
 
-                const resBoardName = await fetch(`/api/board/name/${boardToken}`);
-                const {data} = await resBoardName.json();
+                const resChannelItemName = await fetch(`/api/channel/item/name/${token}`);
+                const {data} = await resChannelItemName.json();
                 if (!data) {
                     throw new Error("게시판 이름 불러오기 실패")
                 }
 
                 setPosts(result.data.posts)
-                setBoardName(data.name)
+                setChannelItemName(data.name)
 
                 setError(null);
             } catch (err) {
@@ -79,11 +79,11 @@ function BoardSection({boardToken}: {
         };
 
         fetchPreviewData();
-    }, [boardToken]);
+    }, [token]);
 
     return (
         <div className="bg-white rounded-xl p-2 shadow-sm border border-gray-150">
-            <h3 className="text-lg font-semibold mb-3 text-gray-700">{boardName}</h3>
+            <h3 className="text-lg font-semibold mb-3 text-gray-700">{channelItemName}</h3>
 
             {loading ? (
                 <div className="space-y-2">

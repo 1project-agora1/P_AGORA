@@ -3,7 +3,7 @@ import {generateRandomToken} from "@/util/RandomToken";
 import {PostCreateRequest} from "../request/PostRequest";
 
 export class PostQuery {
-    async findPreviewList(boardToken: string, page: number, pageSize: number) {
+    async findPreviewList(channelItemToken: string, page: number, pageSize: number) {
         const prisma = PrismaClientManager.getClient();
         const paginatedResults = await prisma.post.findMany({
             select: {
@@ -14,7 +14,7 @@ export class PostQuery {
                 createdAt: true,    // 게시물 생성 시간
             },
             where: {
-                board_token: boardToken,
+                channel_item_token: channelItemToken,
             },
             orderBy: {
                 createdAt: "desc", // 최신순 정렬
@@ -26,7 +26,7 @@ export class PostQuery {
         // 총 데이터 개수 계산
         const totalCount = await prisma.post.count({
             where: {
-                board_token: boardToken,
+                channel_item_token: channelItemToken,
             },
         });
 
@@ -63,7 +63,7 @@ export class PostQuery {
             title: data.title,
             content: data.content,
             user_token: data.user_token,
-            board_token: data.board_token,
+            channel_item_token: data.channel_item_token,
             views: 0,
             likes: 0,
             updatedAt: new Date(),
