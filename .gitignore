@@ -51,4 +51,4 @@ package-lock.json
 /uploaded/
 
 #prisma
-!/prisma/migrations/
+/prisma/migrations/
