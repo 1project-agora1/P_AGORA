@@ -6,27 +6,26 @@ import {PostListForm} from "@/components/post/PostListForm"
 import {pathDivided} from "@/util/PathDivider"
 
 interface ChannelItemData {
-    token: string
+    token: string;
 }
 
 export default function PostList() {
     const pathname = usePathname()
-    const [channelItemData, setChannelItemData] = useState<ChannelItemData[]>([])
+    const [channelItemData, setChannelItemData] = useState<ChannelItemData | null>(null)
     const [loading, setLoading] = useState(true)
 
     useEffect(() => {
-        if (!pathname) return
+        if (!pathname) return;
 
         const {item5} = pathDivided(pathname)
-        setChannelItemData([{
-            token: item5
-        }])
-        setLoading(false)
+
+        setChannelItemData({token : item5});
+        setLoading(false);
     }, [pathname])
 
-    if (!pathname || loading) {
+    if (!pathname || loading || !channelItemData) {
         return <div className="p-4">로딩 중...</div>
     }
 
-    return <PostListForm channelItems={channelItemData}/>
+    return <PostListForm channelItem={channelItemData}/>
 }

@@ -1,7 +1,6 @@
 "use client";
 
 import SubmitButton from "@/components/button/SubmitButton";
-import {PostListForm} from "@/components/post/PostListForm";
 import {pathDivided} from "@/util/PathDivider";
 import Link from "next/link";
 import {usePathname} from "next/navigation";
@@ -24,7 +23,8 @@ export default function Channel() {
     return (
         <div>
             <div className="my-5">
-                <PostListForm channelItems={channelItemData}/>
+                {/*TODO: 다른 PR 에서 새로운 Form 작성 예정*/}
+                {/*<PostListForm channelItems={channelItemData}/>*/}
             </div>
             <Link href={`/channel/${channel}/${channelItemData}/write`}>
                 <SubmitButton buttonName="글쓰기"/>
