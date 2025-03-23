@@ -56,14 +56,16 @@ const editorConfig = {
 export default function Editor({
     item,
     channel,
+    data,
 }: {
     item: string;
     channel: string;
+    data?: any;
 }): JSX.Element {
     return (
         <LexicalComposer initialConfig={editorConfig}>
             <ToolbarContext>
-                <LexicalEditor item={item} channel={channel} />
+                <LexicalEditor item={item} channel={channel} data={data} />
             </ToolbarContext>
         </LexicalComposer>
     );
@@ -80,16 +82,17 @@ interface UseSettings {
 function LexicalEditor({
     item,
     channel,
+    data,
 }: {
     item: string;
     channel: string;
+    data?: any;
 }): JSX.Element {
     const { user } = useUser();
     const {
         settings: { hasLinkAttributes },
     }: UseSettings = useSettings();
     const isEditable: boolean = useLexicalEditable();
-
     const [floatingAnchorElem, setFloatingAnchorElem] =
         useState<HTMLDivElement | null>(null);
     const [isSmallWidthViewport, setIsSmallWidthViewport] =
@@ -107,6 +110,15 @@ function LexicalEditor({
         setTitle(e.target.value);
     };
     useEffect(() => {
+        if (data?.content) {
+            editor.update(() => {
+                const editorState = editor.parseEditorState(data.content);
+                editor.setEditorState(editorState);
+            });
+        }
+    }, [data?.content, editor]);
+
+    useEffect(() => {
         const updateViewPortWidth = () => {
             const isNextSmallWidthViewport =
                 CAN_USE_DOM && window.matchMedia("(max-width: 1025px)").matches;
@@ -117,21 +129,24 @@ function LexicalEditor({
         };
         updateViewPortWidth();
         window.addEventListener("resize", updateViewPortWidth);
-
         return () => {
             window.removeEventListener("resize", updateViewPortWidth);
         };
     }, [isSmallWidthViewport]);
+
     const saveContent = async (e: any) => {
         e.preventDefault();
         const editorState = editor.getEditorState();
 
         const content = JSON.stringify(editorState.toJSON());
-        //TODO : 게시판 저장 로직 추가
-        console.log(content.length);
-        console.log(title);
-        console.log(user.token);
-        console.log(item);
+        if (data?.token) {
+            await updatePost(content);
+        } else {
+            await savePost(content);
+        }
+    };
+
+    const savePost = async (content: string) => {
         await fetch("/api/post/create", {
             method: "POST",
             headers: {
@@ -152,12 +167,36 @@ function LexicalEditor({
             }
         });
     };
+
+    const updatePost = async (content: string) => {
+        await fetch("/api/post/update", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+                channel_item_token: item,
+                title: title == "" ? data.title : title,
+                content: content,
+                user_token: user?.token,
+                token: data.token,
+            }),
+        }).then((res) => {
+            if (res.ok) {
+                alert("게시글이 성공적으로 수정되었습니다.");
+                window.location.href = `/channel/${channel}/${item}`;
+            } else {
+                alert("게시글 저장에 실패하였습니다.");
+            }
+        });
+    };
     return (
         <form onSubmit={saveContent}>
             <div className="w-full border-b-2 border-gray-200 mb-4">
                 <label htmlFor="title">제목</label>
                 <input
                     onChange={handleTitleChange}
+                    defaultValue={data?.title}
                     className="w-full text-lg px-2"
                     type="text"
                     name="title"

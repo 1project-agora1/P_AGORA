@@ -30,4 +30,20 @@ export class PostRepository {
         }
         return convertBigIntToString(response);
     }
+
+    async updatePost(data: PostCreateRequest) {
+        const response = await this.query.updatePost(data);
+        if (response == null) {
+            return null;
+        }
+        return convertBigIntToString(response);
+    }
+
+    async deletePost(postToken: string) {
+        const response = await this.query.deletePost(postToken);
+        if (response == null) {
+            return null;
+        }
+        return convertBigIntToString(response);
+    }
 }
