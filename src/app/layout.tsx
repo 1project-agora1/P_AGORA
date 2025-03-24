@@ -40,6 +40,7 @@ export default async function RootLayout({
     } catch (error) {
         console.error("Error fetching channels:", error);
     }
+
     return (
         <html lang="en">
             <body>

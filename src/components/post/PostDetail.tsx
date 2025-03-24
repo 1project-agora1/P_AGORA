@@ -1,4 +1,5 @@
 "use client";
+import { useUser } from "@/hooks/useUser";
 import { PostDetailType } from "@/lib/types/PostType";
 import { formatDistanceToNow } from "date-fns";
 import { ko } from "date-fns/locale";
@@ -10,7 +11,7 @@ const PostDetail: React.FC<PostDetailType> = ({ data }) => {
     if (!data) {
         return <div>게시물 데이터를 불러올 수 없습니다.</div>;
     }
-
+    const { user } = useUser();
     let content;
     try {
         content = JSON.parse(data.content);

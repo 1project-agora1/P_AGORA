@@ -3,6 +3,7 @@ export interface PostCreateRequest {
     title: string;
     content: string;
     user_token: string;
+    token?: string;
 }
 
 export interface PostPreviewRequest {

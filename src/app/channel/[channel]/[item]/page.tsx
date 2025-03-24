@@ -1,33 +1,25 @@
 "use client";
 
 import SubmitButton from "@/components/button/SubmitButton";
-import {PostListForm} from "@/components/post/PostListForm";
-import {pathDivided} from "@/util/PathDivider";
+import { PostListForm } from "@/components/post/PostListForm";
+import { ChannelItemData } from "@/lib/types/ChannerType";
+import { pathDivided } from "@/util/PathDivider";
 import Link from "next/link";
-import {usePathname} from "next/navigation";
-import {useState} from "react";
-
-interface ChannelItemData {
-    token: string;
-}
+import { usePathname } from "next/navigation";
 
 export default function Channel() {
     const pathname = usePathname();
-    const {item3, item4} = pathDivided(pathname);
+    const { item3, item4 } = pathDivided(pathname);
     const channel = item3;
-    const [channelItemData, setChannelItemData] = useState<ChannelItemData[]>([])
-
-    setChannelItemData([{
-        token: item4
-    }])
+    const channelItemData: ChannelItemData = { token: item4 };
 
     return (
         <div>
             <div className="my-5">
-                <PostListForm channelItems={channelItemData}/>
+                <PostListForm channelItem={channelItemData} />
             </div>
-            <Link href={`/channel/${channel}/${channelItemData}/write`}>
-                <SubmitButton buttonName="글쓰기"/>
+            <Link href={`/channel/${channel}/${item4}/write`}>
+                <SubmitButton buttonName="글쓰기" />
             </Link>
         </div>
     );
