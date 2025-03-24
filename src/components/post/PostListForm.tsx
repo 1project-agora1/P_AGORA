@@ -1,40 +1,43 @@
 "use client";
 
-import {useEffect, useState} from "react";
-import {Post} from "@prisma/client";
-import {Skeleton} from "@mui/material";
 import ErrorDisplay from "@/components/ErrorDisplay";
-import {ApiResponse} from "@/lib/ApiResponse";
-import {ClockIcon, DocumentIcon, EyeIcon, HeartIcon} from "@heroicons/react/24/outline";
-import {PostListResponse} from "@/lib/response/PostResponse";
-import {formatDistanceToNow} from "date-fns";
-import {ko} from "date-fns/locale";
+import { ApiResponse } from "@/lib/ApiResponse";
+import { PostListResponse } from "@/lib/response/PostResponse";
+import { ChannelItemData } from "@/lib/types/ChannerType";
+import {
+    ClockIcon,
+    DocumentIcon,
+    EyeIcon,
+    HeartIcon,
+} from "@heroicons/react/24/outline";
+import { Skeleton } from "@mui/material";
+import { Post } from "@prisma/client";
+import { formatDistanceToNow } from "date-fns";
+import { ko } from "date-fns/locale";
+import Link from "next/link";
+import { useEffect, useState } from "react";
 
-interface ChannelItemData {
-    token: string;
-}
-
-export function PostListForm({channelItem}: { channelItem: ChannelItemData }) {
+export function PostListForm({
+    channelItem,
+}: {
+    channelItem: ChannelItemData;
+}) {
     return (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 p-4">
-            {(
-                <ChannelItemSection
-                    key={channelItem.token}
-                    token={channelItem.token}
-                />
-            )}
+            <ChannelItemSection
+                key={channelItem.token}
+                token={channelItem.token}
+            />
         </div>
     );
 }
 
-function ChannelItemSection({token}: {
-    token: string;
-}) {
+function ChannelItemSection({ token }: { token: string }) {
     const [posts, setPosts] = useState<Post[]>([]);
-    const [channelItemName, setChannelItemName] = useState('');
+    const [channelItemName, setChannelItemName] = useState("");
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
-    const SKELETON_ITEMS = Array(3).fill(null)     // TODO: 메인 화면 설정 시 검토 필요
+    const SKELETON_ITEMS = Array(3).fill(null); // TODO: 메인 화면 설정 시 검토 필요
 
     useEffect(() => {
         const fetchPreviewData = async () => {
@@ -53,19 +56,22 @@ function ChannelItemSection({token}: {
                     throw new Error("유효하지 않은 응답 형식");
                 }
 
-                const result: ApiResponse<PostListResponse> = await resPost.json();
+                const result: ApiResponse<PostListResponse> =
+                    await resPost.json();
                 if (!result.success || !result.data) {
                     throw new Error(result.error || "데이터 불러오기 실패");
                 }
 
-                const resChannelItemName = await fetch(`/api/channel/item/name/${token}`);
-                const {data} = await resChannelItemName.json();
+                const resChannelItemName = await fetch(
+                    `/api/channel/item/name/${token}`
+                );
+                const { data } = await resChannelItemName.json();
                 if (!data) {
-                    throw new Error("게시판 이름 불러오기 실패")
+                    throw new Error("게시판 이름 불러오기 실패");
                 }
 
-                setPosts(result.data.posts)
-                setChannelItemName(data.name)
+                setPosts(result.data.posts);
+                setChannelItemName(data.name);
 
                 setError(null);
             } catch (err) {
@@ -83,12 +89,17 @@ function ChannelItemSection({token}: {
 
     return (
         <div className="bg-white rounded-xl p-2 shadow-sm border border-gray-150">
-            <h3 className="text-lg font-semibold mb-3 text-gray-700">{channelItemName}</h3>
+            <h3 className="text-lg font-semibold mb-3 text-gray-700">
+                {channelItemName}
+            </h3>
 
             {loading ? (
                 <div className="space-y-2">
                     {SKELETON_ITEMS.map((_, i) => (
-                        <Skeleton key={`skeleton-${i}`} className="h-10 rounded-md"/>
+                        <Skeleton
+                            key={`skeleton-${i}`}
+                            className="h-10 rounded-md"
+                        />
                     ))}
                 </div>
             ) : error ? (
@@ -99,8 +110,10 @@ function ChannelItemSection({token}: {
                 />
             ) : posts.length === 0 ? (
                 <div className="text-center py-3">
-                    <DocumentIcon className="w-7 h-7 mx-auto text-gray-400"/>
-                    <p className="text-gray-500 text-xs mt-1.5">게시글이 없습니다</p>
+                    <DocumentIcon className="w-7 h-7 mx-auto text-gray-400" />
+                    <p className="text-gray-500 text-xs mt-1.5">
+                        게시글이 없습니다
+                    </p>
                 </div>
             ) : (
                 <div className="space-y-2">
@@ -110,35 +123,44 @@ function ChannelItemSection({token}: {
                             className="p-2 border border-gray-200 rounded-md
                             hover:bg-gray-50 transition-colors cursor-pointer"
                         >
-                            <div className="flex justify-between items-center">
-                                <h4 className="text-sm truncate font-medium text-gray-800">
-                                    {post.title}
-                                </h4>
-                                <div className="flex gap-1.5">
-                                    {/* 조회수 영역 */}
-                                    <div className="flex items-center gap-1 text-gray-500">
-                                        <EyeIcon className="w-3.5 h-3.5"/>
-                                        <span className="text-[11px]">{post.views}</span>
-                                    </div>
+                            <Link href={`${token}/${post.token}`}>
+                                <div className="flex justify-between items-center">
+                                    <h4 className="text-sm truncate font-medium text-gray-800">
+                                        {post.title}
+                                    </h4>
+                                    <div className="flex gap-1.5">
+                                        {/* 조회수 영역 */}
+                                        <div className="flex items-center gap-1 text-gray-500">
+                                            <EyeIcon className="w-3.5 h-3.5" />
+                                            <span className="text-[11px]">
+                                                {post.views}
+                                            </span>
+                                        </div>
 
-                                    {/* 좋아요 영역 */}
-                                    <div className="flex items-center gap-1 text-gray-500">
-                                        <HeartIcon className="w-3.5 h-3.5"/>
-                                        <span className="text-[11px]">{post.likes}</span>
-                                    </div>
+                                        {/* 좋아요 영역 */}
+                                        <div className="flex items-center gap-1 text-gray-500">
+                                            <HeartIcon className="w-3.5 h-3.5" />
+                                            <span className="text-[11px]">
+                                                {post.likes}
+                                            </span>
+                                        </div>
 
-                                    {/* 시간 표시 영역 */}
-                                    <div className="flex items-center gap-1 text-gray-500">
-                                        <ClockIcon className="w-3.5 h-3.5"/>
-                                        <span className="text-[11px]">
-                                            {formatDistanceToNow(new Date(post.createdAt), {
-                                                addSuffix: true,
-                                                locale: ko
-                                            })}
-                                        </span>
+                                        {/* 시간 표시 영역 */}
+                                        <div className="flex items-center gap-1 text-gray-500">
+                                            <ClockIcon className="w-3.5 h-3.5" />
+                                            <span className="text-[11px]">
+                                                {formatDistanceToNow(
+                                                    new Date(post.createdAt),
+                                                    {
+                                                        addSuffix: true,
+                                                        locale: ko,
+                                                    }
+                                                )}
+                                            </span>
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
+                            </Link>
                         </article>
                     ))}
                 </div>

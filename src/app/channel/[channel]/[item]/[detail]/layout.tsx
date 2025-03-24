@@ -1,6 +1,4 @@
 "use client";
-import NavButton from "@/components/button/NavButton";
-import SubmitButton from "@/components/button/SubmitButton";
 import { usePathname } from "next/navigation";
 import React, { useEffect, useState } from "react";
 
@@ -33,14 +31,6 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
                 </div>
             </header>
             <main className="post-content">{children}</main>
-            <footer className="flex justify-end my-2">
-                <NavButton
-                    url={`/channel/${channel}/${item}`}
-                    label="목록으로"
-                    style="mr-2"
-                />
-                <SubmitButton buttonName="수정하기" />
-            </footer>
         </div>
     );
 };

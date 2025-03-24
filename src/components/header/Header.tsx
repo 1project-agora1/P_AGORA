@@ -1,12 +1,16 @@
 "use client";
 
 import { Channel } from "@/lib/types/ChannerType";
+import { UserType } from "@/lib/types/UserType";
 import { Skeleton } from "@mui/material";
-import dynamic from "next/dynamic";
+import Cookies from "js-cookie";
+import jwt from "jsonwebtoken";
 import Image from "next/image";
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { JSX, useEffect, useState } from "react";
 import { RiMenuLine } from "react-icons/ri";
+import LoginModal from "../auth/LoginModal";
+import LogoutForm from "../auth/LogoutForm";
 import Sidebar from "../sidebar/Sidebar";
 
 interface HeaderProps {
@@ -14,20 +18,36 @@ interface HeaderProps {
     loading: boolean;
 }
 
-const DynamicLoginModal = dynamic(
-    () => import("@/components/auth/LoginModal"),
-    { ssr: false }
-);
+export default function Header({
+    channels,
+    loading,
+}: HeaderProps): JSX.Element {
+    const [user, setUser] = useState<UserType>({
+        nickname: "",
+        email: "",
+        token: "",
+    });
 
-export default function Header({ channels, loading }: HeaderProps) {
+    useEffect(() => {
+        const userToken = process.env.NEXT_PUBLIC_ACCESS_TOKEN || "";
+        const cookieValue = Cookies.get(userToken);
+        if (cookieValue) {
+            try {
+                const decoded = jwt.decode(cookieValue) as UserType; // 🔹 클라이언트에서는 검증하지 않고 decode만!
+                if (decoded) {
+                    setUser(decoded);
+                }
+            } catch (error) {
+                console.error("Token decode error:", error);
+            }
+        }
+    }, []);
     const [isScrolled, setIsScrolled] = useState(false);
     const [isSidebarOpen, setIsSidebarOpen] = useState(false); // 사이드바 상태 추가
     const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
     const [activeChannel, setActiveChannel] = useState<string | null>(null); // 활성 채널 상태 추가
-
     const openLoginModal = () => setIsLoginModalOpen(true);
     const closeLoginModal = () => setIsLoginModalOpen(false);
-
     useEffect(() => {
         const handleScroll = () => {
             if (window.scrollY > 0) {
@@ -135,11 +155,20 @@ export default function Header({ channels, loading }: HeaderProps) {
                     </div>
                     {/* 회원 정보 */}
                     <div className="hidden md:block hover:text-primaryThin cursor-pointer">
-                        <button onClick={openLoginModal}>로그인</button>
-                        <DynamicLoginModal
-                            open={isLoginModalOpen}
-                            onClose={closeLoginModal}
-                        />
+                        {user.nickname == "" ? (
+                            <>
+                                <button onClick={openLoginModal}>로그인</button>
+                                <LoginModal
+                                    open={isLoginModalOpen}
+                                    onClose={closeLoginModal}
+                                />
+                            </>
+                        ) : (
+                            <div className="flex flex-row items-center">
+                                <p className="mr-2">{user.nickname}</p>
+                                <LogoutForm />
+                            </div>
+                        )}
                     </div>
 
                     {/* 모바일 메뉴 버튼 */}

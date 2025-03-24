@@ -11,3 +11,7 @@ export interface Channel {
         token: string; // 서브 메뉴의 토큰
     }[];
 }
+
+export interface ChannelItemData {
+    token: string; // 채널 아이템 토큰
+}
