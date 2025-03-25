@@ -1,14 +1,10 @@
 "use client";
 
-import { PostListForm } from "@/components/post/PostListForm";
+import { PostListMainForm } from "@/components/post/PostListMainForm";
 import { ChannelItemData } from "@/lib/types/ChannerType";
 import { pathDivided } from "@/util/PathDivider";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
-
-interface ChannelItemData {
-    token: string;
-}
 
 export default function PostList() {
     const pathname = usePathname();
@@ -31,5 +27,5 @@ export default function PostList() {
         return <div className="p-4">로딩 중...</div>;
     }
 
-    return <PostListForm channelItem={channelItemData} />;
+    return <PostListMainForm channelItem={channelItemData} />;
 }
