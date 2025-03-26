@@ -36,8 +36,4 @@ export class ChannelRepository {
         }
         return convertBigIntToString(response);
     }
-
-    async getChannel(channelToken: string, itemToken: string) {
-        return await this.query.getChannel(channelToken, itemToken);
-    }
 }

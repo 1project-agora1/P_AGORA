@@ -1,17 +1,21 @@
 "use client";
-import { useUser } from "@/hooks/useUser";
+import { useLikePost } from "@/lib/hooks/postHook";
+import { useUser } from "@/lib/hooks/useUser";
 import { PostDetailType } from "@/lib/types/PostType";
 import { formatDistanceToNow } from "date-fns";
 import { ko } from "date-fns/locale";
-import React from "react";
+import React, { useState } from "react";
 import { BiLike } from "react-icons/bi";
 import { BsPeople } from "react-icons/bs";
 
 const PostDetail: React.FC<PostDetailType> = ({ data }) => {
+    const { handleLikePost, handleUnlikePost } = useLikePost();
+    const { user } = useUser();
+    const [like, setLike] = useState<number>(data.likes);
+    const [liked, setLiked] = useState<boolean>(false);
     if (!data) {
         return <div>게시물 데이터를 불러올 수 없습니다.</div>;
     }
-    const { user } = useUser();
     let content;
     try {
         content = JSON.parse(data.content);
@@ -19,7 +23,26 @@ const PostDetail: React.FC<PostDetailType> = ({ data }) => {
         console.error("Content parsing error:", error);
         return <div>게시물 내용을 불러올 수 없습니다.</div>;
     }
-
+    const likeHandler = (token: string) => {
+        if (user.token === "") {
+            alert("로그인이 필요합니다.");
+            return;
+        }
+        if (liked) {
+            handleUnlikePost({
+                userToken: user.token,
+                postToken: token,
+            });
+            setLike((prev) => prev - 1);
+        } else {
+            handleLikePost({
+                userToken: user.token,
+                postToken: token,
+            });
+            setLike((prev) => prev + 1);
+        }
+        setLiked(!liked);
+    };
     return (
         <div>
             <div className="flex justify-between items-center my-2">
@@ -34,8 +57,11 @@ const PostDetail: React.FC<PostDetailType> = ({ data }) => {
                         {data.views}
                     </div>
                     <div className="flex justify-between">
-                        <BiLike className="text-primary hover:text-primaryThin cursor-pointer" />{" "}
-                        {data.likes}
+                        <BiLike
+                            className="text-primary hover:text-primaryThin cursor-pointer"
+                            onClick={() => likeHandler(data.token)}
+                        />{" "}
+                        {like}
                     </div>
                 </div>
             </div>

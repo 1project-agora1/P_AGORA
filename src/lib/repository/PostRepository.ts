@@ -1,5 +1,5 @@
 import { PostQuery } from "@/lib/query/PostQuery";
-import { PostPreviewRequest } from "@/lib/request/PostRequest";
+import { PostLikeRequest, PostPreviewRequest } from "@/lib/request/PostRequest";
 import { convertBigIntToString } from "@/util/ConvertBigIntToString";
 import { PostCreateRequest } from "../request/PostRequest";
 
@@ -43,6 +43,22 @@ export class PostRepository {
         const response = await this.query.deletePost(postToken);
         if (response == null) {
             return null;
+        }
+        return convertBigIntToString(response);
+    }
+    async likePost(data: PostLikeRequest) {
+        const response = await this.query.likePost(data);
+        if (response == null) {
+            console.log("likePost response is null");
+            return {};
+        }
+        return convertBigIntToString(response);
+    }
+    async unLikePost(data: PostLikeRequest) {
+        const response = await this.query.unLikePost(data);
+        if (response == null) {
+            console.log("likePost response is null");
+            return {};
         }
         return convertBigIntToString(response);
     }
