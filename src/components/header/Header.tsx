@@ -1,6 +1,6 @@
 "use client";
 
-import { Channel } from "@/lib/types/ChannerType";
+import { Channel } from "@/lib/types/ChannelType";
 import { UserType } from "@/lib/types/UserType";
 import { Skeleton } from "@mui/material";
 import Cookies from "js-cookie";

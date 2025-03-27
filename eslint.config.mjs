@@ -21,21 +21,7 @@ const eslintConfig = [
             unicorn: unicornPlugin,
         },
         rules: {
-            // 파일명 컨벤션 강제 (PascalCase)
-            "unicorn/filename-case": [
-                "error",
-                {
-                    case: "pascalCase", // PascalCase 강제
-                    ignore: [
-                        "^globals\\.css$", // 전역 CSS 파일 예외 처리
-                        "^favicon\\.ico$", // 파비콘 예외 처리
-                        "^layout\\.tsx$", // Next.js 레이아웃 파일 예외 처리
-                        "^page\\.tsx$", // Next.js 페이지 파일 예외 처리
-                        "^route\\.ts$", // route.ts 파일 예외 처리 추가
-                        "^*.config\\.ts$", // config 설정 파일 예외 처리
-                    ],
-                },
-            ],
+            "@typescript-eslint/no-explicit-any": "off",
             // Check File: 특정 확장자와 폴더 매칭 강제
             "check-file/folder-match-with-fex": [
                 "error",
@@ -58,11 +44,18 @@ const eslintConfig = [
             "public/", // 정적 파일 폴더
             "prisma/", // Prisma 관련 스키마 폴더
             "data/", // 데이터 관련 폴더 (예: JSON 또는 CSV)
+            "components/lexical/",
         ],
     },
     // route.ts 파일에 대한 check-file 규칙 예외 추가 (즉, 해당 룰을 비활성화)
     {
         files: ["**/route.ts"],
+        rules: {
+            "check-file/folder-match-with-fex": "off",
+        },
+    },
+    {
+        folders: ["components/lexical/"],
         rules: {
             "check-file/folder-match-with-fex": "off",
         },

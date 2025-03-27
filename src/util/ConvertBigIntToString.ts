@@ -3,6 +3,9 @@
 export function convertBigIntToString<T extends Record<string, unknown>>(
     obj: T | T[]
 ): T | T[] {
+    if (obj === null) {
+        return obj;
+    }
     return JSON.parse(
         JSON.stringify(obj, (key, value) =>
             typeof value === "bigint" ? value.toString() : value

@@ -1,13 +1,11 @@
 import { ApiResponse } from "@/lib/ApiResponse";
 import { PrismaClientManager } from "@/lib/client/PrismaClientManager";
 import { ChannelItemRepository } from "@/lib/repository/ChannelItemRepository";
+import { NextRequest } from "next/server";
 
-export async function GET(
-    req: Request,
-    context: { params: { token: string } }
-) {
-    const { token: channelItemToken } = await context.params;
-
+export async function GET(req: NextRequest) {
+    const { pathname } = req.nextUrl;
+    const channelItemToken = pathname.split("/").pop() || "";
     try {
         const channelItemRepository = new ChannelItemRepository();
         const channelItem =

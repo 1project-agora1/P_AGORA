@@ -1,4 +1,5 @@
 "use client";
+import { ChannelItemData } from "@/lib/types/ChannelType";
 import { usePathname } from "next/navigation";
 import React, { useEffect, useState } from "react";
 
@@ -11,7 +12,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
     const segments = pathname.split("/");
     const channel = segments[2];
     const item = segments[3];
-    const [category, setCategory] = useState<any>();
+    const [category, setCategory] = useState<ChannelItemData>();
 
     useEffect(() => {
         const fetchData = async () => {
