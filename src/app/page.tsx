@@ -10,22 +10,13 @@ interface ChannelItemData {
 
 export default function Home() {
     // TODO: 메인 페이지에 보여줄 채널 아이템 로직 추가 예정 - 현재는 로컬 DB 더미 데이터 사용
-    // .env 에서 메인 페이지에 띄울 채널 아이템
-    /*const channelItemNums = [1, 2, 3, 4, 5, 6]; // 필요한 채널 번호 배열
-    const mainChannels: ChannelItemData[] = channelItemNums.map((num) => {
-        const envKey = `NEXT_PUBLIC_MAIN_CI_TOKEN${num}`;
-        return { token: getEnvVariable(envKey) };
-    });*/
+    // TODO: 추가 페이지 할당 예정
+    const firstToken: string = process.env.NEXT_PUBLIC_MAIN_CI_TOKEN1 ?? "";
     const mainChannels: ChannelItemData[] = [
-        {token: "d15f898c46f67a0"},
-        {token: "d15f898c46f67a0"},
-        {token: "d15f898c46f67a0"},
-        {token: "d15f898c46f67a0"},
-        {token: "d15f898c46f67a0"},
-        {token: "d15f898c46f67a0"},
-        {token: "d15f898c46f67a0"}
+        {token: firstToken}
     ]
 
+    console.log(mainChannels);
     return (
         <main className="container mx-auto p-4 bg-white min-h-screen">
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 p-4">
