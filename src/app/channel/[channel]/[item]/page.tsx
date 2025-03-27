@@ -17,6 +17,7 @@ export default function Channel() {
         <div>
             <div className="my-5">
                 <PostListForm channelItem={channelItemData} />
+
             </div>
             <Link href={`/channel/${channel}/${item4}/write`}>
                 <SubmitButton buttonName="글쓰기" />

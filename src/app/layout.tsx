@@ -1,7 +1,7 @@
 import Footer from "@/components/footer/Footer";
 import Header from "@/components/header/Header";
 import { ApiResponse } from "@/lib/ApiResponse";
-import { Channel } from "@/lib/types/ChannerType";
+import { Channel } from "@/lib/types/ChannelType";
 import type { Metadata } from "next";
 import "./globals.css";
 

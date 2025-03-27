@@ -1,11 +1,12 @@
-'use client'
+"use client";
 
-import {Suspense} from 'react'
-import {PostListMainForm} from "@/components/post/PostListMainForm";
+import { PostListMainForm } from "@/components/post/PostListMainForm";
+import { CookiesProvider } from "next-client-cookies";
+import { Suspense } from "react";
 
 // 채널 아이템 데이터 인터페이스
 interface ChannelItemData {
-    token: string
+    token: string;
 }
 
 export default function Home() {
@@ -16,6 +17,7 @@ export default function Home() {
         {token: firstToken}
     ]
 
+
     console.log(mainChannels);
     return (
         <main className="container mx-auto p-4 bg-white min-h-screen">
@@ -24,12 +26,20 @@ export default function Home() {
                 {mainChannels.map((channel) => (
                     <Suspense
                         key={channel.token}
-                        fallback={<div className="p-4 bg-gray-100 rounded-lg">로딩 중...</div>}
+                        fallback={
+                            <div className="p-4 bg-gray-100 rounded-lg">
+                                로딩 중...
+                            </div>
+                        }
                     >
-                        <PostListMainForm channelItem={{token: channel.token}}/>
+                        <CookiesProvider value={[]}>
+                            <PostListMainForm
+                                channelItem={{ token: channel.token }}
+                            />
+                        </CookiesProvider>
                     </Suspense>
                 ))}
             </div>
         </main>
-    )
+    );
 }

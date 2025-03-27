@@ -1,7 +1,7 @@
 "use client";
 
 import { PostListMainForm } from "@/components/post/PostListMainForm";
-import { ChannelItemData } from "@/lib/types/ChannerType";
+import { ChannelItemData } from "@/lib/types/ChannelType";
 import { pathDivided } from "@/util/PathDivider";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
