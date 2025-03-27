@@ -12,16 +12,18 @@ import {ko} from "date-fns/locale";
 import Link from "next/link";
 import {useEffect, useState} from "react";
 
-// 메인 페이지 게시물 리스트 폼
-export function PostListMainForm({
+// 일반0 게시물 리스트 폼
+export function PostListForm({
                                  channelItem,
                              }: {
     channelItem: ChannelItemData;
 }) {
     return (
-        <ChannelItemSection
-            token={channelItem.token}
-        />
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 p-4">
+            <ChannelItemSection
+                token={channelItem.token}
+            />
+        </div>
     );
 }
 
