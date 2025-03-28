@@ -1,6 +1,6 @@
 import { PrismaClientManager } from "@/lib/client/PrismaClientManager";
 import { generateRandomToken } from "@/util/RandomToken";
-import { PostCreateRequest } from "../request/PostRequest";
+import { PostCreateRequest, PostLikeRequest } from "../request/PostRequest";
 
 export class PostQuery {
     async findPreviewList(
@@ -100,6 +100,33 @@ export class PostQuery {
         return prisma.post.delete({
             where: {
                 token: postToken,
+            },
+        });
+    }
+
+    async likePost(data: PostLikeRequest) {
+        const prisma = PrismaClientManager.getClient();
+        return await prisma.post.update({
+            where: {
+                token: data.postToken,
+            },
+            data: {
+                likes: {
+                    increment: 1,
+                },
+            },
+        });
+    }
+    async unLikePost(data: PostLikeRequest) {
+        const prisma = PrismaClientManager.getClient();
+        return await prisma.post.update({
+            where: {
+                token: data.postToken,
+            },
+            data: {
+                likes: {
+                    decrement: 1,
+                },
             },
         });
     }

@@ -4,6 +4,7 @@ import DeleteButton from "@/components/button/DeleteButton";
 import NavButton from "@/components/button/NavButton";
 import SubmitButton from "@/components/button/SubmitButton";
 import PostDetail from "@/components/post/PostDetail";
+import { PostDetailTypes } from "@/lib/types/PostType";
 import { UserType } from "@/lib/types/UserType";
 import Box from "@mui/material/Box";
 import CircularProgress from "@mui/material/CircularProgress";
@@ -18,7 +19,7 @@ export default function DetailPage() {
     const channel = segments[2];
     const item = segments[3];
     const post = segments[4];
-    const [data, setData] = useState<any>();
+    const [data, setData] = useState<PostDetailTypes>();
     const [isOwner, setIsOwner] = useState<boolean>(false);
     const [loading, setLoading] = useState<boolean>(true);
 
@@ -82,7 +83,7 @@ export default function DetailPage() {
     };
     return (
         <>
-            <PostDetail data={data} />
+            {data && <PostDetail data={data} />}
             <footer className="flex justify-end my-2">
                 <NavButton
                     url={`/channel/${channel}/${item}`}

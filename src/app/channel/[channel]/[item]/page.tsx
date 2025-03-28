@@ -1,7 +1,7 @@
 "use client";
 
 import SubmitButton from "@/components/button/SubmitButton";
-import { ChannelItemData } from "@/lib/types/ChannerType";
+import { ChannelItemData } from "@/lib/types/ChannelType";
 import { pathDivided } from "@/util/PathDivider";
 import Link from "next/link";
 import { usePathname } from "next/navigation";

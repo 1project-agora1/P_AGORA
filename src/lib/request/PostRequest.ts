@@ -11,3 +11,8 @@ export interface PostPreviewRequest {
     page: number;
     pageSize: number;
 }
+
+export interface PostLikeRequest {
+    userToken: string;
+    postToken: string;
+}

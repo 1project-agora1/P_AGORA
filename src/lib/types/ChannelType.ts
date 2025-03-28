@@ -14,4 +14,8 @@ export interface Channel {
 
 export interface ChannelItemData {
     token: string; // 채널 아이템 토큰
+    parent_menu_token?: string;
+    parent_submenu_token?: string;
+    submenu_name?: string;
+    url?: string;
 }
