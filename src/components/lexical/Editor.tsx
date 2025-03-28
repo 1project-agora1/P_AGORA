@@ -1,7 +1,7 @@
 "use strict";
 import type { JSX } from "react";
 
-import { useUser } from "@/hooks/useUser";
+import { useUser } from "@/lib/hooks/useUser";
 import { CodeNode } from "@lexical/code";
 import { LinkNode } from "@lexical/link";
 import { ListItemNode, ListNode } from "@lexical/list";
