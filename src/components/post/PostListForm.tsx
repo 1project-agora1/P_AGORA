@@ -3,7 +3,7 @@
 import ErrorDisplay from "@/components/ErrorDisplay";
 import {ApiResponse} from "@/lib/ApiResponse";
 import {PostListResponse} from "@/lib/response/PostResponse";
-import {ChannelItemData} from "@/lib/types/ChannerType";
+import {ChannelItemData} from "@/lib/types/ChannelType";
 import {ClockIcon, DocumentIcon, EyeIcon, HeartIcon,} from "@heroicons/react/24/outline";
 import {Skeleton} from "@mui/material";
 import {Post} from "@prisma/client";
