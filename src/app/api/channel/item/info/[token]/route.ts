@@ -1,29 +1,32 @@
-import { ApiResponse } from "@/lib/ApiResponse";
-import { PrismaClientManager } from "@/lib/client/PrismaClientManager";
-import { ChannelItemRepository } from "@/lib/repository/ChannelItemRepository";
-import { NextRequest } from "next/server";
+import {ApiResponse} from "@/lib/ApiResponse";
+import {PrismaClientManager} from "@/lib/client/PrismaClientManager";
+import {ChannelItemRepository} from "@/lib/repository/ChannelItemRepository";
+import {NextRequest} from "next/server";
 
 export async function GET(req: NextRequest) {
-    const { pathname } = req.nextUrl;
+    const {pathname} = req.nextUrl;
     const channelItemToken = pathname.split("/").pop() || "";
     try {
         const channelItemRepository = new ChannelItemRepository();
         const channelItem =
-            await channelItemRepository.findChannelItemName(channelItemToken);
+            await channelItemRepository.findChannelItemInfo(channelItemToken);
         if (!channelItem) {
             return Response.json(
                 {
                     success: false,
                     error: "게시판 조회 실패",
                 } as ApiResponse,
-                { status: 404 }
+                {status: 404}
             );
         }
 
         return Response.json(
             {
                 success: true,
-                data: { name: channelItem.submenu_name },
+                data: {
+                    channelToken: channelItem.parent_menu_token,
+                    name: channelItem.submenu_name,
+                },
             } as ApiResponse<{ name: string }>,
             {
                 status: 200,
@@ -39,7 +42,7 @@ export async function GET(req: NextRequest) {
                 success: false,
                 error: "서버 에러",
             } as ApiResponse,
-            { status: 500 }
+            {status: 500}
         );
     } finally {
         await PrismaClientManager.shutdown();

@@ -1,16 +1,16 @@
 "use client";
-import { useLikePost } from "@/lib/hooks/postHook";
-import { useUser } from "@/lib/hooks/useUser";
-import { PostDetailType } from "@/lib/types/PostType";
-import { formatDistanceToNow } from "date-fns";
-import { ko } from "date-fns/locale";
-import React, { useState } from "react";
-import { BiLike } from "react-icons/bi";
-import { BsPeople } from "react-icons/bs";
+import {useLikePost} from "@/lib/hooks/postHook";
+import {useUser} from "@/lib/hooks/useUser";
+import {PostDetailType} from "@/lib/types/PostType";
+import {formatDistanceToNow} from "date-fns";
+import {ko} from "date-fns/locale";
+import React, {useState} from "react";
+import {BiLike} from "react-icons/bi";
+import {BsPeople} from "react-icons/bs";
 
-const PostDetail: React.FC<PostDetailType> = ({ data }) => {
-    const { handleLikePost, handleUnlikePost } = useLikePost();
-    const { user } = useUser();
+const PostDetail: React.FC<PostDetailType> = ({data}) => {
+    const {handleLikePost, handleUnlikePost} = useLikePost();
+    const {user} = useUser();
     const [like, setLike] = useState<number>(data.likes);
     const [liked, setLiked] = useState<boolean>(false);
     if (!data) {
@@ -53,7 +53,7 @@ const PostDetail: React.FC<PostDetailType> = ({ data }) => {
                         locale: ko,
                     })}
                     <div className="flex justify-between">
-                        <BsPeople className="text-primary hover:text-primaryThin cursor-pointer" />{" "}
+                        <BsPeople className="text-primary hover:text-primaryThin cursor-pointer"/>{" "}
                         {data.views}
                     </div>
                     <div className="flex justify-between">
@@ -67,60 +67,64 @@ const PostDetail: React.FC<PostDetailType> = ({ data }) => {
             </div>
 
             <div className=" bg-gray-50 p-5">
-                {content.root.children.map((child: any, index: number) => (
-                    <div key={index}>
-                        {child.children.map(
-                            (subChild: any, subIndex: number) => {
-                                if (subChild.type === "image") {
-                                    return (
-                                        <div
-                                            key={subIndex}
-                                            style={{
-                                                textAlign: "center",
-                                                margin: "10px 0",
-                                            }}
-                                        >
-                                            <img
-                                                src={subChild.src}
-                                                alt={subChild.altText}
+                {content?.root?.children ? (
+                    content.root.children.map((child: any, index: number) => (
+                        <div key={index}>
+                            {child.children.map(
+                                (subChild: any, subIndex: number) => {
+                                    if (subChild.type === "image") {
+                                        return (
+                                            <div
+                                                key={subIndex}
                                                 style={{
-                                                    maxWidth: subChild.maxWidth,
+                                                    textAlign: "center",
+                                                    margin: "10px 0",
                                                 }}
-                                            />
-                                            {subChild.showCaption && (
-                                                <p
+                                            >
+                                                <img
+                                                    src={subChild.src}
+                                                    alt={subChild.altText}
                                                     style={{
-                                                        fontStyle: "italic",
-                                                        color: "#666",
+                                                        maxWidth: subChild.maxWidth,
                                                     }}
-                                                >
-                                                    {
-                                                        subChild.caption
-                                                            .editorState.root
-                                                            .children[0]?.text
-                                                    }
-                                                </p>
-                                            )}
-                                        </div>
-                                    );
-                                } else if (subChild.type === "text") {
-                                    return (
-                                        <p
-                                            key={subIndex}
-                                            style={{
-                                                lineHeight: "1.6",
-                                                margin: "10px 0",
-                                            }}
-                                        >
-                                            {subChild.text}
-                                        </p>
-                                    );
+                                                />
+                                                {subChild.showCaption && (
+                                                    <p
+                                                        style={{
+                                                            fontStyle: "italic",
+                                                            color: "#666",
+                                                        }}
+                                                    >
+                                                        {
+                                                            subChild.caption
+                                                                .editorState.root
+                                                                .children[0]?.text
+                                                        }
+                                                    </p>
+                                                )}
+                                            </div>
+                                        );
+                                    } else if (subChild.type === "text") {
+                                        return (
+                                            <p
+                                                key={subIndex}
+                                                style={{
+                                                    lineHeight: "1.6",
+                                                    margin: "10px 0",
+                                                }}
+                                            >
+                                                {subChild.text}
+                                            </p>
+                                        );
+                                    }
+                                    return null;
                                 }
-                                return null;
-                            }
-                        )}
-                    </div>
-                ))}
+                            )}
+                        </div>
+                    ))
+                ) :(
+                    <div> 게시물 내용이 없습니다. </div>
+                )}
             </div>
             <div
                 style={{

@@ -30,7 +30,7 @@ export function PostListMainForm({
 
 function ChannelItemSection({token}: { token: string }) {
     const [posts, setPosts] = useState<Post[]>([]);
-    const [channelItemName, setChannelItemName] = useState("");
+    const [channelItemInfo, setChannelItemInfo] = useState<{ channelToken: string, name: string | null }>();
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
     const SKELETON_ITEMS = Array(3).fill(null); // TODO: 메인 화면 설정 시 검토 필요
@@ -59,16 +59,20 @@ function ChannelItemSection({token}: { token: string }) {
                     throw new Error(result.error || "데이터 불러오기 실패");
                 }
 
-                const resChannelItemName = await fetch(
-                    `/api/channel/item/name/${token}`
+                const resChannelItemInfo = await fetch(
+                    `/api/channel/item/info/${token}`
                 );
-                const {data} = await resChannelItemName.json();
+                const {data} = await resChannelItemInfo.json();
                 if (!data) {
                     throw new Error("게시판 이름 불러오기 실패");
                 }
 
                 setPosts(result.data.posts);
-                setChannelItemName(data.name);
+                setChannelItemInfo({
+                        channelToken: data.channelToken,
+                        name: data.name
+                    }
+                );
 
                 setError(null);
             } catch (err) {
@@ -98,7 +102,7 @@ function ChannelItemSection({token}: { token: string }) {
     return (
         <div className="bg-white rounded-xl p-2 shadow-sm border border-gray-150">
             <h3 className="text-lg font-semibold mb-3 text-gray-700">
-                {channelItemName}
+                {channelItemInfo?.name}
             </h3>
 
             {loading ? (
@@ -131,13 +135,27 @@ function ChannelItemSection({token}: { token: string }) {
                             className="p-2 border border-gray-200 rounded-md
                             hover:bg-gray-50 transition-colors cursor-pointer flex justify-between"
                         >
-                            <Link href={`${token}/${post.token}`}>
+                            {channelItemInfo?.channelToken ? (
+                                <Link
+                                    href={
+                                        channelItemInfo?.channelToken
+                                            ? `channel/${channelItemInfo.channelToken}/${token}/${post.token}`
+                                            : "#"
+                                    }
+                                >
+                                    <div className="flex justify-between items-center w-full">
+                                        <h4 className="text-sm truncate font-medium text-gray-800">
+                                            {post.title}
+                                        </h4>
+                                    </div>
+                                </Link>
+                            ) : (
                                 <div className="flex justify-between items-center w-full">
-                                    <h4 className="text-sm truncate font-medium text-gray-800">
-                                        {post.title}
+                                    <h4 className="text-sm truncate font-medium text-gray-400">
+                                        링크 생성 중...
                                     </h4>
                                 </div>
-                            </Link>
+                            )}
                             <div className="flex gap-1.5">
                                 {/* 조회수 영역 */}
                                 <div className="flex items-center gap-1 text-gray-500">
