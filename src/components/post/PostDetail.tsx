@@ -67,6 +67,7 @@ const PostDetail: React.FC<PostDetailType> = ({data}) => {
             </div>
 
             <div className=" bg-gray-50 p-5">
+                {/*TODO: post 의 content 표현인 것 같은데 children col 은 존재하지 않음*/}
                 {content?.root?.children ? (
                     content.root.children.map((child: any, index: number) => (
                         <div key={index}>
