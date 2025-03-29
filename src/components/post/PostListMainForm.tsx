@@ -33,7 +33,7 @@ function ChannelItemSection({token}: { token: string }) {
     const [channelItemInfo, setChannelItemInfo] = useState<{ channelToken: string, name: string | null }>();
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
-    const SKELETON_ITEMS = Array(3).fill(null); // TODO: 메인 화면 설정 시 검토 필요
+    const SKELETON_ITEMS = Array(3).fill(null);
     const {handleLikePost} = useLikePost();
     const {user} = useUser();
     useEffect(() => {

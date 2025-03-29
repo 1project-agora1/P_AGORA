@@ -1,6 +1,6 @@
-import { PrismaClientManager } from "@/lib/client/PrismaClientManager";
-import { generateRandomToken } from "@/util/RandomToken";
-import { PostCreateRequest, PostLikeRequest } from "../request/PostRequest";
+import {PrismaClientManager} from "@/lib/client/PrismaClientManager";
+import {generateRandomToken} from "@/util/RandomToken";
+import {PostCreateRequest, PostLikeRequest} from "../request/PostRequest";
 
 export class PostQuery {
     async findPreviewList(
@@ -12,6 +12,7 @@ export class PostQuery {
         const paginatedResults = await prisma.post.findMany({
             select: {
                 token: true, // 상세 조회 넘어가기 위한 토큰
+                user_token: true, // 게시물 작성자를 확인하기 위한 토큰
                 title: true, // 미리 보기 리스트에서 보여줄 항목
                 views: true, // 미리 보기 리스트에서 보여줄 항목
                 likes: true, // 미리 보기 리스트에서 보여줄 항목
@@ -117,6 +118,7 @@ export class PostQuery {
             },
         });
     }
+
     async unLikePost(data: PostLikeRequest) {
         const prisma = PrismaClientManager.getClient();
         return await prisma.post.update({
