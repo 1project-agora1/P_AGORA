@@ -1,41 +1,43 @@
 "use client";
 
 import ErrorDisplay from "@/components/ErrorDisplay";
-import {ApiResponse} from "@/lib/ApiResponse";
-import {useLikePost} from "@/lib/hooks/postHook";
-import {useUser} from "@/lib/hooks/useUser";
-import {PostListResponse} from "@/lib/response/PostResponse";
-import {ChannelItemData} from "@/lib/types/ChannelType";
-import {ClockIcon, DocumentIcon, EyeIcon, HeartIcon,} from "@heroicons/react/24/outline";
-import {Skeleton} from "@mui/material";
-import {Post} from "@prisma/client";
-import {formatDistanceToNow} from "date-fns";
-import {ko} from "date-fns/locale";
+import { ApiResponse } from "@/lib/ApiResponse";
+import { useLikePost } from "@/lib/hooks/postHook";
+import { useUser } from "@/lib/hooks/useUser";
+import { PostListResponse } from "@/lib/response/PostResponse";
+import { ChannelItemData } from "@/lib/types/ChannelType";
+import {
+    ClockIcon,
+    DocumentIcon,
+    EyeIcon,
+    HeartIcon,
+} from "@heroicons/react/24/outline";
+import { Skeleton } from "@mui/material";
+import { Post } from "@prisma/client";
+import { formatDistanceToNow } from "date-fns";
+import { ko } from "date-fns/locale";
 import Link from "next/link";
-import {useEffect, useState} from "react";
+import { useEffect, useState } from "react";
 
 // 메인 페이지 게시물 리스트 폼
 export function PostListMainForm({
-                                     channelItem,
-                                 }: {
+    channelItem,
+}: {
     channelItem: ChannelItemData;
 }) {
     return (
-        <ChannelItemSection
-            key={channelItem.token}
-            token={channelItem.token}
-        />
+        <ChannelItemSection key={channelItem.token} token={channelItem.token} />
     );
 }
 
-function ChannelItemSection({token}: { token: string }) {
+function ChannelItemSection({ token }: { token: string }) {
     const [posts, setPosts] = useState<Post[]>([]);
     const [channelItemName, setChannelItemName] = useState("");
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
     const SKELETON_ITEMS = Array(3).fill(null); // TODO: 메인 화면 설정 시 검토 필요
-    const {handleLikePost} = useLikePost();
-    const {user} = useUser();
+    const { handleLikePost } = useLikePost();
+    const { user } = useUser();
     useEffect(() => {
         const fetchPreviewData = async () => {
             try {
@@ -62,7 +64,7 @@ function ChannelItemSection({token}: { token: string }) {
                 const resChannelItemName = await fetch(
                     `/api/channel/item/name/${token}`
                 );
-                const {data} = await resChannelItemName.json();
+                const { data } = await resChannelItemName.json();
                 if (!data) {
                     throw new Error("게시판 이름 불러오기 실패");
                 }
@@ -118,7 +120,7 @@ function ChannelItemSection({token}: { token: string }) {
                 />
             ) : posts.length === 0 ? (
                 <div className="text-center py-3">
-                    <DocumentIcon className="w-7 h-7 mx-auto text-gray-400"/>
+                    <DocumentIcon className="w-7 h-7 mx-auto text-gray-400" />
                     <p className="text-gray-500 text-xs mt-1.5">
                         게시글이 없습니다
                     </p>
@@ -141,7 +143,7 @@ function ChannelItemSection({token}: { token: string }) {
                             <div className="flex gap-1.5">
                                 {/* 조회수 영역 */}
                                 <div className="flex items-center gap-1 text-gray-500">
-                                    <EyeIcon className="w-3.5 h-3.5 "/>
+                                    <EyeIcon className="w-3.5 h-3.5 " />
                                     <span className="text-[11px]">
                                         {post.views}
                                     </span>
@@ -160,7 +162,7 @@ function ChannelItemSection({token}: { token: string }) {
 
                                 {/* 시간 표시 영역 */}
                                 <div className="flex items-center gap-1 text-gray-500">
-                                    <ClockIcon className="w-3.5 h-3.5"/>
+                                    <ClockIcon className="w-3.5 h-3.5" />
                                     <span className="text-[11px]">
                                         {formatDistanceToNow(
                                             new Date(post.createdAt),

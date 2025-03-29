@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { likePost, unLikePost } from "../funcions/postsFn";
+import { likePost, unLikePost, viewPost } from "../funcions/postsFn";
 
 export const useLikePost = () => {
     const [loading, setLoading] = useState(false);
@@ -42,6 +42,21 @@ export const useLikePost = () => {
             setLoading(false);
         }
     };
+    const handleViewPost = async (postLikeToken: { postToken: string }) => {
+        setLoading(true);
+        setError(null);
+        try {
+            return await viewPost(postLikeToken);
+        } catch (err) {
+            if (err instanceof TypeError && err.message.includes("fetch")) {
+                setError(new Error("Network error: Failed to fetch"));
+            } else {
+                setError(err as Error);
+            }
+        } finally {
+            setLoading(false);
+        }
+    };
 
-    return { handleLikePost, handleUnlikePost, loading, error };
+    return { handleLikePost, handleUnlikePost, handleViewPost, loading, error };
 };

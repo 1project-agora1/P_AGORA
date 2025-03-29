@@ -1,4 +1,3 @@
-"use strict";
 import type { JSX } from "react";
 
 import { useUser } from "@/lib/hooks/useUser";
