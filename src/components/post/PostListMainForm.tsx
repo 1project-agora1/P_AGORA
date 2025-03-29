@@ -100,10 +100,20 @@ function ChannelItemSection({token}: { token: string }) {
     };
 
     return (
-        <div className="bg-white rounded-xl p-2 shadow-sm border border-gray-150">
-            <h3 className="text-lg font-semibold mb-3 text-gray-700">
-                {channelItemInfo?.name}
-            </h3>
+        <div className="bg-white rounded-2xl p-2 shadow-sm border border-gray-150">
+            <Link
+                href={
+                    channelItemInfo?.channelToken
+                        ? `/channel/${channelItemInfo.channelToken}/${token}`
+                        : "#"
+                }
+            >
+                <h3 className=
+                        "text-lg font-semibold mb-3 text-gray-700 hover:text-blue-600 transition-colors cursor-pointer"
+                >
+                    {channelItemInfo?.name || "채널 이름 로드 중..."}
+                </h3>
+            </Link>
 
             {loading ? (
                 <div className="space-y-2">
