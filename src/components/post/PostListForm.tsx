@@ -12,7 +12,6 @@ import Link from "next/link";
 import {useEffect, useState} from "react";
 import {ChannelItemData} from "@/lib/types/ChannelType";
 
-// 게시판 UI
 export function PostListForm({channelItem}: { channelItem: ChannelItemData }) {
 
     return (
@@ -82,6 +81,9 @@ function PostListSection({token}: { token: string }) {
     const [userNames, setUserNames] = useState<{ [key: string]: string }>({});
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
+    const [page, setPage] = useState(1); // 현재 페이지 상태
+    const [pageSize] = useState(10); // 페이지당 게시물 수 (고정값)
+    const [totalPages, setTotalPages] = useState(1); // 총 페이지 수
     const SKELETON_ITEMS = Array(5).fill(null);
 
     useEffect(() => {
@@ -134,9 +136,10 @@ function PostListSection({token}: { token: string }) {
                     userNamesMap[userToken] = nickname;
                 });
 
-                // Set
+                // 상태 업데이트
                 setPosts(result.data.posts);
                 setUserNames(userNamesMap);
+                setTotalPages(result.data.totalPages); // 총 페이지 수 설정
                 setError(null);
             } catch (err) {
                 const errorMessage =
@@ -148,7 +151,7 @@ function PostListSection({token}: { token: string }) {
         };
 
         fetchPreviewData();
-    }, [token]);
+    }, [token, page]);
 
     return (
         <>
@@ -223,14 +226,17 @@ function PostListSection({token}: { token: string }) {
                         </tbody>
                     </table>
 
-                    {/*페이지네이션 (예시) */} {/*TODO: 페이지네이션 작업 중*/}
+                    {/* 페이지네이션 */}
                     <div className="flex justify-center mt-4 space-x-1">
-                        {[1, 2, 3, 4].map((page) => (
+                        {[...Array(totalPages)].map((_, index) => (
                             <button
-                                key={page}
-                                className="px-3 py-1 border border-gray-300 rounded-md hover:bg-blue-100"
+                                key={index}
+                                onClick={() => setPage(index + 1)}
+                                className={`px-3 py-1 border border-gray-300 rounded-md ${
+                                    page === index + 1 ? "bg-blue-100" : ""
+                                }`}
                             >
-                                {page}
+                                {index + 1}
                             </button>
                         ))}
                     </div>
