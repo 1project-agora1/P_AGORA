@@ -4,7 +4,7 @@ import DeleteButton from "@/components/button/DeleteButton";
 import NavButton from "@/components/button/NavButton";
 import SubmitButton from "@/components/button/SubmitButton";
 import PostDetail from "@/components/post/PostDetail";
-import { PostDetailTypes } from "@/lib/types/PostType";
+import { PostDetailAllotType } from "@/lib/types/PostType";
 import { UserType } from "@/lib/types/UserType";
 import Box from "@mui/material/Box";
 import CircularProgress from "@mui/material/CircularProgress";
@@ -19,7 +19,7 @@ export default function DetailPage() {
     const channel = segments[2];
     const item = segments[3];
     const post = segments[4];
-    const [data, setData] = useState<PostDetailTypes>();
+    const [data, setData] = useState<PostDetailAllotType>();
     const [isOwner, setIsOwner] = useState<boolean>(false);
     const [loading, setLoading] = useState<boolean>(true);
 

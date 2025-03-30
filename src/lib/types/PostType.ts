@@ -11,7 +11,7 @@ export interface PostDetailType {
     };
 }
 
-export interface PostDetailTypes {
+export interface PostDetailAllotType {
     token: string;
     title: string;
     content: string;
