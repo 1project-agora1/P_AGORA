@@ -47,11 +47,6 @@ export class UserRepository {
         return user;
     }
 
-    // 유저 이름
-    async findUserNameByToken(token: string) {
-        return await this.query.findByToken(token);
-    }
-
     // 새로운 유저 생성
     async createNewUser(email: string, nickname: string, password: string) {
         const hashedPassword = await bcrypt.hash(password, 10);

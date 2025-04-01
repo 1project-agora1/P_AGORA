@@ -29,7 +29,7 @@ export function PostListMainForm({
 }
 
 function ChannelItemSection({token}: { token: string }) {
-    const [posts, setPosts] = useState<Post[]>([]);
+    const [posts, setPosts] = useState<PostListResponse>();
     const [channelItemInfo, setChannelItemInfo] = useState<{ channelToken: string, name: string | null }>();
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
@@ -67,7 +67,7 @@ function ChannelItemSection({token}: { token: string }) {
                     throw new Error("게시판 이름 불러오기 실패");
                 }
 
-                setPosts(result.data.posts);
+                setPosts(result.data);
                 setChannelItemInfo({
                         channelToken: data.channelToken,
                         name: data.name
@@ -130,7 +130,7 @@ function ChannelItemSection({token}: { token: string }) {
                     message={error}
                     retryFn={() => window.location.reload()}
                 />
-            ) : posts.length === 0 ? (
+            ) : posts?.posts.length === 0 ? (
                 <div className="text-center py-3">
                     <DocumentIcon className="w-7 h-7 mx-auto text-gray-400"/>
                     <p className="text-gray-500 text-xs mt-1.5">
@@ -139,7 +139,7 @@ function ChannelItemSection({token}: { token: string }) {
                 </div>
             ) : (
                 <div className="space-y-2">
-                    {posts.map((post) => (
+                    {posts?.posts.map((post) => (
                         <article
                             key={post.token}
                             className="p-2 border border-gray-200 rounded-md

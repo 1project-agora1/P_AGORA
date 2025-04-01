@@ -39,16 +39,4 @@ export class UserQuery {
             },
         });
     }
-
-    async findByToken(token: string) {
-        const prisma = PrismaClientManager.getClient();
-        return prisma.user.findFirst({
-            select:{
-                nickname: true,
-            },
-            where: {
-                token,
-            }
-        })
-    }
 }
