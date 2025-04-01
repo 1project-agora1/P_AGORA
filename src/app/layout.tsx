@@ -3,6 +3,7 @@ import Header from "@/components/header/Header";
 import { ApiResponse } from "@/lib/ApiResponse";
 import { Channel } from "@/lib/types/ChannelType";
 import type { Metadata } from "next";
+import { ToastContainer } from "react-toastify";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -49,6 +50,7 @@ export default async function RootLayout({
                     {children}
                 </div>
                 <Footer />
+                <ToastContainer />
             </body>
         </html>
     );

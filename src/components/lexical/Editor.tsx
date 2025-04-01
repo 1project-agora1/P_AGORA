@@ -19,7 +19,10 @@ import { TabIndentationPlugin } from "@lexical/react/LexicalTabIndentationPlugin
 import { useLexicalEditable } from "@lexical/react/useLexicalEditable";
 import { HeadingNode, QuoteNode } from "@lexical/rich-text";
 import { CAN_USE_DOM } from "@lexical/utils";
+import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+import { toast, ToastContainer } from "react-toastify";
+import LoginModal from "../auth/LoginModal";
 import SubmitButton from "../button/SubmitButton";
 import { useSettings } from "./context/SettingsContext";
 import { ToolbarContext } from "./context/ToolbarContext";
@@ -97,10 +100,15 @@ function LexicalEditor({
         useState<HTMLDivElement | null>(null);
     const [isSmallWidthViewport, setIsSmallWidthViewport] =
         useState<boolean>(false);
+    const router = useRouter();
+
     const [editor] = useLexicalComposerContext();
     const [activeEditor, setActiveEditor] = useState(editor);
     const [isLinkEditMode, setIsLinkEditMode] = useState<boolean>(false);
     const [title, setTitle] = useState<string>("");
+    const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
+    const closeLoginModal = () => setIsLoginModalOpen(false);
+
     const onRef = (_floatingAnchorElem: HTMLDivElement) => {
         if (_floatingAnchorElem !== null) {
             setFloatingAnchorElem(_floatingAnchorElem);
@@ -137,6 +145,11 @@ function LexicalEditor({
     const saveContent = async (e: any) => {
         e.preventDefault();
         const editorState = editor.getEditorState();
+        if (user?.token === "") {
+            toast.error("로그인이 필요합니다.");
+            setIsLoginModalOpen(true);
+            return;
+        }
 
         const content = JSON.stringify(editorState.toJSON());
         if (data?.token) {
@@ -158,14 +171,18 @@ function LexicalEditor({
                 content: content,
                 user_token: user?.token,
             }),
-        }).then((res) => {
-            if (res.ok) {
-                alert("게시글이 성공적으로 저장되었습니다.");
-                window.location.href = `/channel/${channel}/${item}`;
-            } else {
-                alert("게시글 저장에 실패하였습니다.");
-            }
-        });
+        })
+            .then((res) => {
+                if (res.ok) {
+                    window.location.href = `/channel/${channel}/${item}?state=saveSuccess`;
+                } else if (res.status !== 200) {
+                    toast.error("게시글 저장에 실패하였습니다.");
+                }
+            })
+            .catch((error) => {
+                console.error("Error saving post:", error);
+                toast.error("게시글 저장 중 오류가 발생했습니다.");
+            });
     };
 
     const updatePost = async (content: string) => {
@@ -183,10 +200,9 @@ function LexicalEditor({
             }),
         }).then((res) => {
             if (res.ok) {
-                alert("게시글이 성공적으로 수정되었습니다.");
-                window.location.href = `/channel/${channel}/${item}`;
+                window.location.href = `/channel/${channel}/${item}?state=editSuccess`;
             } else {
-                alert("게시글 저장에 실패하였습니다.");
+                toast.warning("게시글 저장에 실패하였습니다.");
             }
         });
     };
@@ -246,6 +262,8 @@ function LexicalEditor({
                 <TabIndentationPlugin maxIndent={7} />
             </div>
             <SubmitButton style="mb-2" buttonName="저장하기" />
+            <LoginModal open={isLoginModalOpen} onClose={closeLoginModal} />
+            <ToastContainer />
         </form>
     );
 }
