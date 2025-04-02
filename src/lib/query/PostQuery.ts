@@ -1,6 +1,10 @@
 import { PrismaClientManager } from "@/lib/client/PrismaClientManager";
 import { generateRandomToken } from "@/util/RandomToken";
-import { PostCreateRequest, PostLikeRequest } from "../request/PostRequest";
+import {
+  PostCreateRequest,
+  PostLikeRequest,
+  PostViewRequest,
+} from "../request/PostRequest";
 
 export class PostQuery {
   async findPreviewList(
@@ -118,32 +122,44 @@ export class PostQuery {
       },
     });
   }
+    async likePost(data: PostLikeRequest) {
+        const prisma = PrismaClientManager.getClient();
+        return prisma.post.update({
+          where: {
+            token: data.postToken,
+          },
+          data: {
+            likes: {
+              increment: 1,
+            },
+          },
+        });
+    }
+    async unLikePost(data: PostLikeRequest) {
+        const prisma = PrismaClientManager.getClient();
+        return prisma.post.update({
+          where: {
+            token: data.postToken,
+          },
+          data: {
+            likes: {
+              decrement: 1,
+            },
+          },
+        });
+    }
 
-  async likePost(data: PostLikeRequest) {
-    const prisma = PrismaClientManager.getClient();
-    return await prisma.post.update({
-      where: {
-        token: data.postToken,
-      },
-      data: {
-        likes: {
-          increment: 1,
-        },
-      },
-    });
-  }
-
-  async unLikePost(data: PostLikeRequest) {
-    const prisma = PrismaClientManager.getClient();
-    return await prisma.post.update({
-      where: {
-        token: data.postToken,
-      },
-      data: {
-        likes: {
-          decrement: 1,
-        },
-      },
-    });
-  }
+    async viewPost(data: PostViewRequest) {
+        const prisma = PrismaClientManager.getClient();
+        return prisma.post.update({
+          where: {
+            token: data.postToken,
+          },
+          data: {
+            views: {
+              increment: 1,
+            },
+          },
+        });
+    }
 }

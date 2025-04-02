@@ -1,5 +1,9 @@
 import { PostQuery } from "@/lib/query/PostQuery";
-import { PostLikeRequest, PostPreviewRequest } from "@/lib/request/PostRequest";
+import {
+    PostLikeRequest,
+    PostPreviewRequest,
+    PostViewRequest,
+} from "@/lib/request/PostRequest";
 import { convertBigIntToString } from "@/util/ConvertBigIntToString";
 import { PostCreateRequest } from "../request/PostRequest";
 import { PostListResponse } from "@/lib/response/PostResponse";
@@ -44,29 +48,36 @@ export class PostRepository {
     return convertBigIntToString(response);
   }
 
-  async deletePost(postToken: string) {
-    const response = await this.query.deletePost(postToken);
-    if (response == null) {
-      return null;
+    async deletePost(postToken: string) {
+        const response = await this.query.deletePost(postToken);
+        if (response == null) {
+            return null;
+        }
+        return convertBigIntToString(response);
     }
-    return convertBigIntToString(response);
-  }
+    async likePost(data: PostLikeRequest) {
+        const response = await this.query.likePost(data);
+        if (response == null) {
+            console.log("likePost response is null");
+            return {};
+        }
+        return convertBigIntToString(response);
+    }
+    async unLikePost(data: PostLikeRequest) {
+        const response = await this.query.unLikePost(data);
+        if (response == null) {
+            console.log("likePost response is null");
+            return {};
+        }
+        return convertBigIntToString(response);
+    }
 
-  async likePost(data: PostLikeRequest) {
-    const response = await this.query.likePost(data);
-    if (response == null) {
-      console.log("likePost response is null");
-      return {};
+    async viewPost(data: PostViewRequest) {
+        const response = await this.query.viewPost(data);
+        if (response == null) {
+            console.log("viewPost response is null");
+            return {};
+        }
+        return convertBigIntToString(response);
     }
-    return convertBigIntToString(response);
-  }
-
-  async unLikePost(data: PostLikeRequest) {
-    const response = await this.query.unLikePost(data);
-    if (response == null) {
-      console.log("likePost response is null");
-      return {};
-    }
-    return convertBigIntToString(response);
-  }
 }

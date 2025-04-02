@@ -1,59 +1,55 @@
-"use client"
+"use client";
 
-import {LoginValidator} from "@/lib/Validator"
-import {z} from "zod"
+import { LoginValidator } from "@/lib/Validator";
+import Link from "next/link";
 import React from "react";
-import Link from 'next/link';
+import { z } from "zod";
 
 export default function LoginForm({
-                                      onSuccess, onClose
-                                  }: {
+    onSuccess,
+    onClose,
+}: {
     onSuccess?: () => void;
-    onClose?: () => void
+    onClose?: () => void;
 }) {
     const handleSubmit = async (e: React.FormEvent) => {
-        e.preventDefault()
-        const formData = new FormData(e.currentTarget as HTMLFormElement)
+        e.preventDefault();
+        const formData = new FormData(e.currentTarget as HTMLFormElement);
 
         try {
             // Zod 유효성 검사
             const validatedData = LoginValidator.parse({
-                email: formData.get('email'),
-                password: formData.get('password')
-            })
+                email: formData.get("email"),
+                password: formData.get("password"),
+            });
 
-            const res = await fetch('/api/login', {
-                method: 'POST',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify(validatedData)
-            })
+            const res = await fetch("/api/login", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(validatedData),
+            });
 
             if (res.ok) {
                 onSuccess?.(); // 모달 닫기 호출
-                window.location.href = '/dashboard'
+                window.location.reload(); // 페이지 새로고침
             } else {
-                const errorData = await res.json()
-                alert(errorData.message || '로그인에 실패했습니다')
+                const errorData = await res.json();
+                alert(errorData.message || "로그인에 실패했습니다");
             }
         } catch (error) {
             if (error instanceof z.ZodError) {
                 // Zod 에러 메시지 처리
-                const errorMessage = error.errors[0]?.message
-                alert(errorMessage || '입력값을 확인해주세요')
-                return
+                const errorMessage = error.errors[0]?.message;
+                alert(errorMessage || "입력값을 확인해주세요");
+                return;
             }
-            alert('예상치 못한 오류가 발생했습니다')
+            alert("예상치 못한 오류가 발생했습니다");
         }
-    }
+    };
 
     return (
         <form onSubmit={handleSubmit}>
-            <input
-                type="email"
-                name="email"
-                placeholder="Email"
-                required
-            />
+            <input type="email" name="email" placeholder="Email" required />
             <input
                 type="password"
                 name="password"
@@ -75,6 +71,5 @@ export default function LoginForm({
                 </Link>
             </div>
         </form>
-
-    )
+    );
 }

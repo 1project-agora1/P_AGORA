@@ -16,3 +16,7 @@ export interface PostLikeRequest {
     userToken: string;
     postToken: string;
 }
+
+export interface PostViewRequest {
+    postToken: string;
+}

@@ -7,12 +7,13 @@ import { useUser } from "@/lib/hooks/useUser";
 import { PostListResponse } from "@/lib/response/PostResponse";
 import { ChannelItemData } from "@/lib/types/ChannelType";
 import {
-  ClockIcon,
-  DocumentIcon,
-  EyeIcon,
-  HeartIcon,
+    ClockIcon,
+    DocumentIcon,
+    EyeIcon,
+    HeartIcon,
 } from "@heroicons/react/24/outline";
 import { Skeleton } from "@mui/material";
+import { Post } from "@prisma/client";
 import { formatDistanceToNow } from "date-fns";
 import { ko } from "date-fns/locale";
 import Link from "next/link";
@@ -20,13 +21,13 @@ import { useEffect, useState } from "react";
 
 // 메인 페이지 게시물 리스트 폼
 export function PostListMainForm({
-  channelItem,
+    channelItem,
 }: {
-  channelItem: ChannelItemData;
+    channelItem: ChannelItemData;
 }) {
-  return (
-    <ChannelItemSection key={channelItem.token} token={channelItem.token} />
-  );
+    return (
+        <ChannelItemSection key={channelItem.token} token={channelItem.token} />
+    );
 }
 
 function ChannelItemSection({ token }: { token: string }) {
