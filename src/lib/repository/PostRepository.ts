@@ -15,11 +15,22 @@ export class PostRepository {
     }
 
     // 최신 게시물 미리 보기 리스트 조회
-    async findRecentPostPreList(params: PostPreviewRequest) {
+    async findRecentPostPreList(params: PostPreviewRequest): Promise<{
+        data: {
+            token: string;
+            title: string;
+            views: number;
+            likes: number;
+            createdAt: Date;
+            nickname: any;
+        }[];
+        totalCount: number;
+        totalPages: number;
+    }> {
         return this.query.findPreviewList(
             params.channel_item_token,
             params.page,
-            params.pageSize
+            params.pageSize,
         );
     }
 
@@ -50,6 +61,7 @@ export class PostRepository {
         }
         return convertBigIntToString(response);
     }
+
     async likePost(data: PostLikeRequest) {
         const response = await this.query.likePost(data);
         if (response == null) {
@@ -58,6 +70,7 @@ export class PostRepository {
         }
         return convertBigIntToString(response);
     }
+
     async unLikePost(data: PostLikeRequest) {
         const response = await this.query.unLikePost(data);
         if (response == null) {

@@ -5,13 +5,13 @@ export class UserQuery {
         const prisma = PrismaClientManager.getClient();
         return prisma.user
             .findUnique({
-                where: { email },
                 select: {
                     password: true,
                     nickname: true,
                     email: true,
                     token: true,
                 },
+                where: { email },
             })
             .then((user) =>
                 user ? { ...user, password: user.password! } : null
@@ -21,10 +21,10 @@ export class UserQuery {
     async findByEmailAndNickname(email: string, nickname: string) {
         const prisma = PrismaClientManager.getClient();
         return prisma.user.findFirst({
+            select: { email: true, nickname: true },
             where: {
                 OR: [{ email }, { nickname }],
             },
-            select: { email: true, nickname: true },
         });
     }
 

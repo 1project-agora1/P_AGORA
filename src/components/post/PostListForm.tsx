@@ -1,78 +1,59 @@
 "use client";
 
-import ErrorDisplay from "@/components/ErrorDisplay";
-import {ApiResponse} from "@/lib/ApiResponse";
-import {PostListResponse} from "@/lib/response/PostResponse";
-import {ChannelItemData} from "@/lib/types/ChannelType";
-import {ClockIcon, DocumentIcon, EyeIcon, HeartIcon,} from "@heroicons/react/24/outline";
-import {Skeleton} from "@mui/material";
-import {Post} from "@prisma/client";
-import {formatDistanceToNow} from "date-fns";
-import {ko} from "date-fns/locale";
-import Link from "next/link";
-import {useEffect, useState} from "react";
+import { useEffect, useState } from "react";
+import { ChannelItemData } from "@/lib/types/ChannelType";
+import { PostListSection } from "@/components/post/PostListSection";
 
-// 일반0 게시물 리스트 폼
 export function PostListForm({
-                                 channelItem,
-                             }: {
+    channelItem,
+}: {
     channelItem: ChannelItemData;
 }) {
     return (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 p-4">
-            <ChannelItemSection
-                token={channelItem.token}
-            />
+        <div className="p-4">
+            {/* 채널 아이템 정보 */}
+            <div className="bg-blue-100 p-3 rounded-md shadow-sm mb-4">
+                <ChannelItemSection token={channelItem.token} />
+            </div>
+
+            {/* 게시물 목록 */}
+            <div className="bg-white p-3 rounded-md shadow-sm">
+                <h2 className="text-2xl font-semibold text-gray-700 mb-2">
+                    게시글 목록
+                </h2>
+                <PostListSection token={channelItem.token} />
+            </div>
         </div>
     );
 }
 
-function ChannelItemSection({token}: { token: string }) {
-    const [posts, setPosts] = useState<Post[]>([]);
-    const [channelItemName, setChannelItemName] = useState("");
+function ChannelItemSection({ token }: { token: string }) {
+    const [channelItemInfo, setChannelItemInfo] = useState<{
+        channelToken: string;
+        name: string | null;
+    }>();
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
-    const SKELETON_ITEMS = Array(3).fill(null);
 
     useEffect(() => {
-        console.log("fetchPreviewData called with token:", token); // 로그 추가
-
         const fetchPreviewData = async () => {
-            console.log("ChannelItemSection useEffect", token);
-
             try {
                 if (!token) {
                     throw new Error("유효하지 않은 게시판 토큰");
                 }
 
-                const resPost = await fetch(`/api/post/list/preview/${token}`);
-
-                if (!resPost.ok) {
-                    throw new Error(`HTTP ${resPost.status}`);
-                }
-
-                const contentType = resPost.headers.get("content-type");
-                if (!contentType?.includes("application/json")) {
-                    throw new Error("유효하지 않은 응답 형식");
-                }
-
-                const result: ApiResponse<PostListResponse> =
-                    await resPost.json();
-                if (!result.success || !result.data) {
-                    throw new Error(result.error || "데이터 불러오기 실패");
-                }
-
-                const resChannelItemName = await fetch(
-                    `/api/channel/item/name/${token}`
+                const resChannelItemInfo = await fetch(
+                    `/api/channel/item/info/${token}`,
                 );
-                const {data} = await resChannelItemName.json();
+                const { data } = await resChannelItemInfo.json();
                 if (!data) {
                     throw new Error("게시판 이름 불러오기 실패");
                 }
 
-                setPosts(result.data.posts);
-                setChannelItemName(data.name);
-
+                setChannelItemInfo({
+                    channelToken: data.channelToken,
+                    name: data.name,
+                });
                 setError(null);
             } catch (err) {
                 const errorMessage =
@@ -88,83 +69,10 @@ function ChannelItemSection({token}: { token: string }) {
     }, [token]);
 
     return (
-        <div className="bg-white rounded-xl p-2 shadow-sm border border-gray-150">
-            <h3 className="text-lg font-semibold mb-3 text-gray-700">
-                {channelItemName}
-            </h3>
-
-            {loading ? (
-                <div className="space-y-2">
-                    {SKELETON_ITEMS.map((_, i) => (
-                        <Skeleton
-                            key={`skeleton-${i}`}
-                            className="h-10 rounded-md"
-                        />
-                    ))}
-                </div>
-            ) : error ? (
-                <ErrorDisplay
-                    title="데이터 로딩 실패"
-                    message={error}
-                    retryFn={() => window.location.reload()}
-                />
-            ) : posts.length === 0 ? (
-                <div className="text-center py-3">
-                    <DocumentIcon className="w-7 h-7 mx-auto text-gray-400"/>
-                    <p className="text-gray-500 text-xs mt-1.5">
-                        게시글이 없습니다
-                    </p>
-                </div>
-            ) : (
-                <div className="space-y-2">
-                    {posts.map((post) => (
-                        <article
-                            key={post.token}
-                            className="p-2 border border-gray-200 rounded-md
-                            hover:bg-gray-50 transition-colors cursor-pointer"
-                        >
-                            <Link href={`${token}/${post.token}`}>
-                                <div className="flex justify-between items-center">
-                                    <h4 className="text-sm truncate font-medium text-gray-800">
-                                        {post.title}
-                                    </h4>
-                                    <div className="flex gap-1.5">
-                                        {/* 조회수 영역 */}
-                                        <div className="flex items-center gap-1 text-gray-500">
-                                            <EyeIcon className="w-3.5 h-3.5"/>
-                                            <span className="text-[11px]">
-                                                {post.views}
-                                            </span>
-                                        </div>
-
-                                        {/* 좋아요 영역 */}
-                                        <div className="flex items-center gap-1 text-gray-500">
-                                            <HeartIcon className="w-3.5 h-3.5"/>
-                                            <span className="text-[11px]">
-                                                {post.likes}
-                                            </span>
-                                        </div>
-
-                                        {/* 시간 표시 영역 */}
-                                        <div className="flex items-center gap-1 text-gray-500">
-                                            <ClockIcon className="w-3.5 h-3.5"/>
-                                            <span className="text-[11px]">
-                                                {formatDistanceToNow(
-                                                    new Date(post.createdAt),
-                                                    {
-                                                        addSuffix: true,
-                                                        locale: ko,
-                                                    }
-                                                )}
-                                            </span>
-                                        </div>
-                                    </div>
-                                </div>
-                            </Link>
-                        </article>
-                    ))}
-                </div>
-            )}
-        </div>
+        <h2 className="text-3xl font-semibold text-gray-700 mb-1">
+            <span className="text-blue-900">
+                {channelItemInfo?.name} 게시판
+            </span>
+        </h2>
     );
 }

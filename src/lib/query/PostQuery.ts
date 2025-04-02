@@ -10,16 +10,22 @@ export class PostQuery {
     async findPreviewList(
         channelItemToken: string,
         page: number,
-        pageSize: number
+        pageSize: number,
     ) {
         const prisma = PrismaClientManager.getClient();
         const paginatedResults = await prisma.post.findMany({
             select: {
                 token: true, // 상세 조회 넘어가기 위한 토큰
+                user_token: true, // 게시물 작성자를 확인하기 위한 토큰
                 title: true, // 미리 보기 리스트에서 보여줄 항목
                 views: true, // 미리 보기 리스트에서 보여줄 항목
                 likes: true, // 미리 보기 리스트에서 보여줄 항목
                 createdAt: true, // 게시물 생성 시간
+                user: {
+                    select: {
+                        nickname: true, // 작성자 닉네임 가져오기
+                    },
+                },
             },
             where: {
                 channel_item_token: channelItemToken,
@@ -37,9 +43,18 @@ export class PostQuery {
                 channel_item_token: channelItemToken,
             },
         });
+        // 반환 데이터 타입을 명확히 정의하여 클라이언트와 일치하도록 수정
+        const formattedResults = paginatedResults.map((post) => ({
+            token: post.token,
+            title: post.title,
+            views: post.views,
+            likes: post.likes,
+            createdAt: post.createdAt,
+            nickname: post.user?.nickname || "Unknown", // 작성자 닉네임 병합
+        }));
 
         return {
-            data: paginatedResults,
+            data: formattedResults,
             totalCount, // 총 데이터 개수 반환
             totalPages: Math.ceil(totalCount / pageSize), // 총 페이지 수 계산
         };
@@ -110,7 +125,7 @@ export class PostQuery {
 
     async likePost(data: PostLikeRequest) {
         const prisma = PrismaClientManager.getClient();
-        return await prisma.post.update({
+        return prisma.post.update({
             where: {
                 token: data.postToken,
             },
@@ -121,9 +136,10 @@ export class PostQuery {
             },
         });
     }
+
     async unLikePost(data: PostLikeRequest) {
         const prisma = PrismaClientManager.getClient();
-        return await prisma.post.update({
+        return prisma.post.update({
             where: {
                 token: data.postToken,
             },
@@ -137,7 +153,7 @@ export class PostQuery {
 
     async viewPost(data: PostViewRequest) {
         const prisma = PrismaClientManager.getClient();
-        return await prisma.post.update({
+        return prisma.post.update({
             where: {
                 token: data.postToken,
             },

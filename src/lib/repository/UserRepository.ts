@@ -1,11 +1,8 @@
-import { deleteCookie, setCookie } from "@/lib/Cookies";
-import {
-    AuthenticationError,
-    DuplicateUserError,
-} from "@/lib/errors/AuthError";
-import { UserQuery } from "@/lib/query/UserQuery";
+import {deleteCookie, setCookie} from "@/lib/Cookies";
+import {AuthenticationError, DuplicateUserError,} from "@/lib/errors/AuthError";
+import {UserQuery} from "@/lib/query/UserQuery";
 import bcrypt from "bcryptjs";
-import { UserType } from "../types/UserType";
+import {UserType} from "../types/UserType";
 
 export class UserRepository {
     private query: UserQuery;

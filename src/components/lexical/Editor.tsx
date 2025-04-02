@@ -37,6 +37,7 @@ import "./themes/PlaygroundEditorTheme";
 import theme from "./themes/PlaygroundEditorTheme";
 import ContentEditable from "./ui/ContentEditable";
 import { ListPlugin } from "./utils/LexicalListPlugin";
+
 const editorConfig = {
     namespace: "MyEditor",
     theme: theme,

@@ -13,7 +13,6 @@ import {
     HeartIcon,
 } from "@heroicons/react/24/outline";
 import { Skeleton } from "@mui/material";
-import { Post } from "@prisma/client";
 import { formatDistanceToNow } from "date-fns";
 import { ko } from "date-fns/locale";
 import Link from "next/link";
@@ -31,11 +30,14 @@ export function PostListMainForm({
 }
 
 function ChannelItemSection({ token }: { token: string }) {
-    const [posts, setPosts] = useState<Post[]>([]);
-    const [channelItemName, setChannelItemName] = useState("");
+    const [posts, setPosts] = useState<PostListResponse>();
+    const [channelItemInfo, setChannelItemInfo] = useState<{
+        channelToken: string;
+        name: string | null;
+    }>();
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
-    const SKELETON_ITEMS = Array(3).fill(null); // TODO: 메인 화면 설정 시 검토 필요
+    const SKELETON_ITEMS = Array(3).fill(null);
     const { handleLikePost } = useLikePost();
     const { user } = useUser();
     useEffect(() => {
@@ -61,16 +63,19 @@ function ChannelItemSection({ token }: { token: string }) {
                     throw new Error(result.error || "데이터 불러오기 실패");
                 }
 
-                const resChannelItemName = await fetch(
-                    `/api/channel/item/name/${token}`
+                const resChannelItemInfo = await fetch(
+                    `/api/channel/item/info/${token}`,
                 );
-                const { data } = await resChannelItemName.json();
+                const { data } = await resChannelItemInfo.json();
                 if (!data) {
                     throw new Error("게시판 이름 불러오기 실패");
                 }
 
-                setPosts(result.data.posts);
-                setChannelItemName(data.name);
+                setPosts(result.data);
+                setChannelItemInfo({
+                    channelToken: data.channelToken,
+                    name: data.name,
+                });
 
                 setError(null);
             } catch (err) {
@@ -98,10 +103,18 @@ function ChannelItemSection({ token }: { token: string }) {
     };
 
     return (
-        <div className="bg-white rounded-xl p-2 shadow-sm border border-gray-150">
-            <h3 className="text-lg font-semibold mb-3 text-gray-700">
-                {channelItemName}
-            </h3>
+        <div className="bg-white rounded-2xl p-2 shadow-sm border border-gray-150">
+            <Link
+                href={
+                    channelItemInfo?.channelToken
+                        ? `/channel/${channelItemInfo.channelToken}/${token}`
+                        : "#"
+                }
+            >
+                <h3 className="text-lg font-semibold mb-3 text-gray-700 hover:text-blue-600 transition-colors cursor-pointer">
+                    {channelItemInfo?.name || "채널 이름 로드 중..."}
+                </h3>
+            </Link>
 
             {loading ? (
                 <div className="space-y-2">
@@ -118,7 +131,7 @@ function ChannelItemSection({ token }: { token: string }) {
                     message={error}
                     retryFn={() => window.location.reload()}
                 />
-            ) : posts.length === 0 ? (
+            ) : posts?.posts.length === 0 ? (
                 <div className="text-center py-3">
                     <DocumentIcon className="w-7 h-7 mx-auto text-gray-400" />
                     <p className="text-gray-500 text-xs mt-1.5">
@@ -127,19 +140,33 @@ function ChannelItemSection({ token }: { token: string }) {
                 </div>
             ) : (
                 <div className="space-y-2">
-                    {posts.map((post) => (
+                    {posts?.posts.map((post) => (
                         <article
                             key={post.token}
                             className="p-2 border border-gray-200 rounded-md
                             hover:bg-gray-50 transition-colors cursor-pointer flex justify-between"
                         >
-                            <Link href={`${token}/${post.token}`}>
+                            {channelItemInfo?.channelToken ? (
+                                <Link
+                                    href={
+                                        channelItemInfo?.channelToken
+                                            ? `channel/${channelItemInfo.channelToken}/${token}/${post.token}`
+                                            : "#"
+                                    }
+                                >
+                                    <div className="flex justify-between items-center w-full">
+                                        <h4 className="text-sm truncate font-medium text-gray-800">
+                                            {post.title}
+                                        </h4>
+                                    </div>
+                                </Link>
+                            ) : (
                                 <div className="flex justify-between items-center w-full">
-                                    <h4 className="text-sm truncate font-medium text-gray-800">
-                                        {post.title}
+                                    <h4 className="text-sm truncate font-medium text-gray-400">
+                                        링크 생성 중...
                                     </h4>
                                 </div>
-                            </Link>
+                            )}
                             <div className="flex gap-1.5">
                                 {/* 조회수 영역 */}
                                 <div className="flex items-center gap-1 text-gray-500">
@@ -169,7 +196,7 @@ function ChannelItemSection({ token }: { token: string }) {
                                             {
                                                 addSuffix: true,
                                                 locale: ko,
-                                            }
+                                            },
                                         )}
                                     </span>
                                 </div>

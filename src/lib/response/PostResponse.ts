@@ -1,7 +1,14 @@
-import {Post} from "@prisma/client";
-
 export type PostListResponse = {
-    posts: Post[];
-    totalCount: number;
-    totalPages: number;
+  posts: PostPreviewResponse[];
+  totalCount: number;
+  totalPages: number;
+};
+
+type PostPreviewResponse = {
+  token: string;
+  title: string;
+  views: number;
+  likes: number;
+  createdAt: Date;
+  nickname: string;
 };

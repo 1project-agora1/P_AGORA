@@ -7,8 +7,8 @@ export class ChannelItemRepository {
         this.query = new ChannelItemQuery();
     }
 
-    async findChannelItemName(token: string){
-        return this.query.findChannelItemNameByToken(token);
+    async findChannelItemInfo(token: string){
+        return this.query.findChannelItemInfoByToken(token);
     }
 
 }
