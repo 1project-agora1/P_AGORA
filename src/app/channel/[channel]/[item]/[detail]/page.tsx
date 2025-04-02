@@ -4,6 +4,7 @@ import DeleteButton from "@/components/button/DeleteButton";
 import NavButton from "@/components/button/NavButton";
 import SubmitButton from "@/components/button/SubmitButton";
 import PostDetail from "@/components/post/PostDetail";
+import { ShareModal } from "@/components/share/ShareModal";
 import { PostDetailAllotType } from "@/lib/types/PostType";
 import { UserType } from "@/lib/types/UserType";
 import Box from "@mui/material/Box";
@@ -103,6 +104,7 @@ export default function DetailPage() {
                         />
                     </>
                 )}
+                <ShareModal />
             </footer>
         </>
     );
