@@ -1,10 +1,10 @@
-import {ApiResponse} from "@/lib/ApiResponse";
-import {PrismaClientManager} from "@/lib/client/PrismaClientManager";
-import {ChannelItemRepository} from "@/lib/repository/ChannelItemRepository";
-import {NextRequest} from "next/server";
+import { ApiResponse } from "@/lib/ApiResponse";
+import { PrismaClientManager } from "@/lib/client/PrismaClientManager";
+import { ChannelItemRepository } from "@/lib/repository/ChannelItemRepository";
+import { NextRequest } from "next/server";
 
 export async function GET(req: NextRequest) {
-    const {pathname} = req.nextUrl;
+    const { pathname } = req.nextUrl;
     const channelItemToken = pathname.split("/").pop() || "";
     try {
         const channelItemRepository = new ChannelItemRepository();
@@ -16,7 +16,7 @@ export async function GET(req: NextRequest) {
                     success: false,
                     error: "게시판 조회 실패",
                 } as ApiResponse,
-                {status: 404}
+                { status: 404 },
             );
         }
 
@@ -30,19 +30,19 @@ export async function GET(req: NextRequest) {
             } as ApiResponse<{ name: string }>,
             {
                 status: 200,
-            }
+            },
         );
     } catch (error) {
         console.error(
             `게시판 이름 조회 에러 - boardToken : ${channelItemToken}`,
-            error
+            error,
         );
         return Response.json(
             {
                 success: false,
                 error: "서버 에러",
             } as ApiResponse,
-            {status: 500}
+            { status: 500 },
         );
     } finally {
         await PrismaClientManager.shutdown();
