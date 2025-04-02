@@ -102,3 +102,16 @@ model ChannelItem {
   @@map("channel_item")
   Post Post[]
 }
+
+// ---------------------------------------------------------------------------------------------------------------------
+// ViewLog
+model ViewLog {
+  token     String   @unique
+  ip        String
+  post_token String
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+  @@id([ip, post_token])
+
+    @@map("view_log")
+}

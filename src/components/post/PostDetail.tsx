@@ -4,15 +4,18 @@ import { useUser } from "@/lib/hooks/useUser";
 import { PostDetailType } from "@/lib/types/PostType";
 import { formatDistanceToNow } from "date-fns";
 import { ko } from "date-fns/locale";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { BiLike } from "react-icons/bi";
 import { BsPeople } from "react-icons/bs";
 
 const PostDetail: React.FC<PostDetailType> = ({ data }) => {
-    const { handleLikePost, handleUnlikePost } = useLikePost();
+    const { handleLikePost, handleUnlikePost, handleViewPost } = useLikePost();
     const { user } = useUser();
     const [like, setLike] = useState<number>(data.likes);
+    const [views, setViews] = useState<number>(data.views);
     const [liked, setLiked] = useState<boolean>(false);
+    const [viewed, setViewed] = useState<boolean>(false); // 추가: 조회 여부 상태
+
     if (!data) {
         return <div>게시물 데이터를 불러올 수 없습니다.</div>;
     }
@@ -43,6 +46,18 @@ const PostDetail: React.FC<PostDetailType> = ({ data }) => {
         }
         setLiked(!liked);
     };
+    useEffect(() => {
+        if (!viewed) {
+            console.log("조회수 증가");
+            handleViewPost({ postToken: data.token }).then((res: any) => {
+                if (res.status === 200) {
+                    setViews((prev) => prev + 1);
+                }
+            });
+            setViewed(true); // 조회 상태를 true로 설정
+        }
+    }, [data.token, viewed]); // 의존성 배열에 data.token과 viewed 추가
+
     return (
         <div>
             <div className="flex justify-between items-center my-2">
@@ -54,7 +69,7 @@ const PostDetail: React.FC<PostDetailType> = ({ data }) => {
                     })}
                     <div className="flex justify-between">
                         <BsPeople className="text-primary hover:text-primaryThin cursor-pointer" />{" "}
-                        {data.views}
+                        {views}
                     </div>
                     <div className="flex justify-between">
                         <BiLike
