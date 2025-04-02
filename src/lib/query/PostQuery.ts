@@ -164,4 +164,33 @@ export class PostQuery {
             },
         });
     }
+
+    async isLikedPost(data: PostLikeRequest) {
+        const prisma = PrismaClientManager.getClient();
+        return prisma.like_log.count({
+            where: {
+                post_token: data.postToken,
+                user_token: data.userToken,
+            },
+        });
+    }
+    async setLikePostLog(data: PostLikeRequest) {
+        const prisma = PrismaClientManager.getClient();
+        return prisma.like_log.create({
+            data: {
+                token: generateRandomToken(),
+                user_token: data.userToken,
+                post_token: data.postToken,
+            },
+        });
+    }
+    async setUnLikePostLog(data: PostLikeRequest) {
+        const prisma = PrismaClientManager.getClient();
+        return prisma.like_log.deleteMany({
+            where: {
+                user_token: data.userToken,
+                post_token: data.postToken,
+            },
+        });
+    }
 }

@@ -4,6 +4,7 @@ import LoadingSpinner from "@/components/LoadingSpinner";
 import { useRouter } from "next/navigation";
 import React, { useState } from "react";
 import { IoLogOutSharp } from "react-icons/io5";
+import { toast } from "react-toastify";
 
 export default function LogoutForm() {
     const router = useRouter();
@@ -29,8 +30,8 @@ export default function LogoutForm() {
             window.location.assign(`/?cacheBust=${Date.now()}`);
         } catch (error) {
             console.error("로그아웃 에러 : ", error);
-            alert(
-                error instanceof Error ? error.message : "알 수 없는 오류 발생"
+            toast.error(
+                error instanceof Error ? error.message : "알 수 없는 오류 발생",
             );
             router.push("/");
         } finally {

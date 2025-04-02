@@ -91,17 +91,6 @@ function ChannelItemSection({ token }: { token: string }) {
         fetchPreviewData();
     }, [token]);
 
-    const likeHandler = (token: string) => {
-        if (user.token === "") {
-            alert("로그인이 필요합니다.");
-            return;
-        }
-        handleLikePost({
-            userToken: user.token,
-            postToken: token,
-        });
-    };
-
     return (
         <div className="bg-white rounded-2xl p-2 shadow-sm border border-gray-150">
             <Link
@@ -178,10 +167,7 @@ function ChannelItemSection({ token }: { token: string }) {
 
                                 {/* 좋아요 영역 */}
                                 <div className="flex items-center gap-1 text-gray-500 z-999">
-                                    <HeartIcon
-                                        className="w-3.5 h-3.5 hover:text-red-600"
-                                        onClick={() => likeHandler(post.token)}
-                                    />
+                                    <HeartIcon className="w-3.5 h-3.5" />
                                     <span className="text-[11px]">
                                         {post.likes}
                                     </span>

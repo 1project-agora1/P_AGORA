@@ -7,9 +7,11 @@ import { ko } from "date-fns/locale";
 import React, { useEffect, useState } from "react";
 import { BiLike } from "react-icons/bi";
 import { BsPeople } from "react-icons/bs";
+import { toast } from "react-toastify";
 
 const PostDetail: React.FC<PostDetailType> = ({ data }) => {
-    const { handleLikePost, handleUnlikePost, handleViewPost } = useLikePost();
+    const { handleLikePost, handleUnlikePost, handleViewPost, isLikePost } =
+        useLikePost();
     const { user } = useUser();
     const [like, setLike] = useState<number>(data.likes);
     const [views, setViews] = useState<number>(data.views);
@@ -28,9 +30,10 @@ const PostDetail: React.FC<PostDetailType> = ({ data }) => {
     }
     const likeHandler = (token: string) => {
         if (user.token === "") {
-            alert("로그인이 필요합니다.");
+            toast.warning("로그인이 필요합니다.");
             return;
         }
+        console.log(liked);
         if (liked) {
             handleUnlikePost({
                 userToken: user.token,
@@ -48,7 +51,6 @@ const PostDetail: React.FC<PostDetailType> = ({ data }) => {
     };
     useEffect(() => {
         if (!viewed) {
-            console.log("조회수 증가");
             handleViewPost({ postToken: data.token }).then((res: any) => {
                 if (res.status === 200) {
                     setViews((prev) => prev + 1);
@@ -56,6 +58,14 @@ const PostDetail: React.FC<PostDetailType> = ({ data }) => {
             });
             setViewed(true); // 조회 상태를 true로 설정
         }
+        isLikePost({
+            userToken: user.token,
+            postToken: data.token,
+        })?.then((res: any) => {
+            if (res.success) {
+                setLiked(res.data.count > 0);
+            }
+        });
     }, [data.token, viewed]); // 의존성 배열에 data.token과 viewed 추가
 
     return (
@@ -132,7 +142,7 @@ const PostDetail: React.FC<PostDetailType> = ({ data }) => {
                                     );
                                 }
                                 return null;
-                            }
+                            },
                         )}
                     </div>
                 ))}

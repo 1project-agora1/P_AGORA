@@ -15,67 +15,47 @@ datasource db {
 // User
 model User {
   id             BigInt   @id @default(autoincrement())
-  token          String   @unique // TODO: 이메일 인증을 위한 토큰
-  nickname       String   @unique // TODO: 닉네임 길이 제한 필요
+  token          String   @unique
+  nickname       String   
   password       String   @db.VarChar(128)
   email          String   @unique
   email_verified Boolean  @default(false)
-  role           UserRole @default(ROLE_USER) // 초기 값 : 일반 유저
+  role           UserRole @default(ROLE_USER)
   createdAt      DateTime @default(now()) @map("created_at")
   updatedAt      DateTime @updatedAt @map("updated_at")
-
-  // mapping - User 1 : N Post
-  posts Post[]
+  posts          Post[]
 
   @@map("user")
-}
-
-// UserRole - enum
-enum UserRole {
-  ROLE_DEVELOPER // 개발자 - 모든 권한
-  ROLE_ADMIN // 관리자 - 개발 제외 모든 운영 권한
-  ROLE_USER // 유저 - 일반 활동 관련 권한
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
 // Post
 model Post {
-  id                 BigInt   @id @default(autoincrement())
-  token              String   @unique // 게시판 글 토큰
+  id                 BigInt      @id @default(autoincrement())
+  token              String      @unique
   channel_item_token String
   title              String
-  content            String   @db.Text
-  user_token         String // 유저 테이블 매핑을 위한 FK
-  views              Int      @default(0)
-  likes              Int      @default(0)
-  createdAt          DateTime @default(now()) @map("created_at")
-  updatedAt          DateTime @updatedAt @map("updated_at")
+  content            String      @db.Text
+  user_token         String
+  views              Int         @default(0)
+  likes              Int         @default(0)
+  createdAt          DateTime    @default(now()) @map("created_at")
+  updatedAt          DateTime    @updatedAt @map("updated_at")
+  channel_item       ChannelItem @relation(fields: [channel_item_token], references: [token])
+  user               User        @relation(fields: [user_token], references: [token])
 
-  // mapping - FK : user_token
-  user User @relation(fields: [user_token], references: [token])
-  channel_item ChannelItem @relation(fields: [channel_item_token], references: [token])
-
+  @@index([channel_item_token], map: "post_channel_item_token_fkey")
+  @@index([user_token], map: "post_user_token_fkey")
   @@map("post")
 }
 
-// PostType - enum
-enum PostType {
-  TEXT_ONLY // 글자만
-  MEDIA_ONLY // 미디어만
-  TEXT_MEDIA // 글자, 미디어 둘 다 존재
-}
-
-// ---------------------------------------------------------------------------------------------------------------------
-// Channel
 model Channel {
-  id        BigInt   @id @default(autoincrement())
-  token     String   @unique
-  menu_name String
-  url       String
-  createdAt DateTime @default(now()) @map("created_at")
-  updatedAt DateTime @updatedAt @map("updated_at")
-
-  // mapping - Channel 1 : N ChannelItem
+  id           BigInt        @id @default(autoincrement())
+  token        String        @unique
+  menu_name    String
+  url          String
+  createdAt    DateTime      @default(now()) @map("created_at")
+  updatedAt    DateTime      @updatedAt @map("updated_at")
   channelItems ChannelItem[]
 
   @@map("channel")
@@ -84,34 +64,69 @@ model Channel {
 // ---------------------------------------------------------------------------------------------------------------------
 // ChannelItem
 model ChannelItem {
-  id                   BigInt   @id @default(autoincrement())
-  token                String   @unique
+  id                   BigInt        @id @default(autoincrement())
+  token                String        @unique
   parent_menu_token    String
   parent_submenu_token String?
   submenu_name         String
   url                  String
-  createdAt            DateTime @default(now()) @map("created_at")
-  updatedAt            DateTime @updatedAt @map("updated_at")
+  createdAt            DateTime      @default(now()) @map("created_at")
+  updatedAt            DateTime      @updatedAt @map("updated_at")
+  channel              Channel       @relation(fields: [parent_menu_token], references: [token])
+  parent               ChannelItem?  @relation("ParentSubmenu", fields: [parent_submenu_token], references: [token])
+  children             ChannelItem[] @relation("ParentSubmenu")
+  Post                 Post[]
 
-  // mapping - FK : parent_menu_token
-  channel  Channel       @relation(fields: [parent_menu_token], references: [token])
-  // mapping - FK : parent_submenu_token
-  parent   ChannelItem?  @relation("ParentSubmenu", fields: [parent_submenu_token], references: [token])
-  children ChannelItem[] @relation("ParentSubmenu")
-
+  @@index([parent_menu_token], map: "channel_item_parent_menu_token_fkey")
+  @@index([parent_submenu_token], map: "channel_item_parent_submenu_token_fkey")
   @@map("channel_item")
-  Post Post[]
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ViewLog
 model ViewLog {
-  token     String   @unique
-  ip        String
+  token      String   @unique
+  ip         String
   post_token String
-  createdAt DateTime @default(now()) @map("created_at")
-  updatedAt DateTime @updatedAt @map("updated_at")
-  @@id([ip, post_token])
+  createdAt  DateTime @default(now()) @map("created_at")
+  updatedAt  DateTime @updatedAt @map("updated_at")
 
-    @@map("view_log")
+  @@id([ip, post_token])
+  @@map("view_log")
+}
+
+enum UserRole {
+  ROLE_DEVELOPER
+  ROLE_ADMIN
+  ROLE_USER
+}
+
+model like_log {
+  token      String   @unique
+  user_token String
+  post_token String
+  createdAt  DateTime @default(now()) @map("created_at")
+  updatedAt  DateTime @updatedAt @map("updated_at")
+
+  @@id([user_token, post_token])
+  @@map("like_log")
+}
+
+
+model SYS_USER {
+  SU_ID    String    @id @db.VarChar(50)
+  SU_PW    String?   @db.VarChar(45)
+  SU_NAME  String?   @db.VarChar(45)
+  SU_PHON  String?   @db.VarChar(45)
+  SU_EMAIL String?   @db.VarChar(45)
+  SU_TYPE  String?   @db.VarChar(45)
+  SU_BRAND String?   @db.VarChar(45)
+  SU_STORE String?   @db.VarChar(45)
+  SU_USEYN String?   @db.VarChar(45)
+  SU_INID  String?   @db.VarChar(45)
+  SU_INDT  DateTime? @db.DateTime(0)
+  SU_UPID  String?   @db.VarChar(45)
+  SU_UPDT  DateTime? @db.DateTime(0)
+
+  @@ignore
 }

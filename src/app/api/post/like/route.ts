@@ -7,6 +7,7 @@ export async function POST(request: Request) {
         const data = await request.json();
         const postRepository = new PostRepository();
         const likePost = await postRepository.likePost(data);
+        await postRepository.setLikePostLog(data);
         return Response.json(
             {
                 success: true,
@@ -17,7 +18,7 @@ export async function POST(request: Request) {
                 headers: {
                     "Content-Type": "application/json",
                 },
-            }
+            },
         );
     } catch (error) {
         console.error(error);
@@ -31,7 +32,7 @@ export async function POST(request: Request) {
                 headers: {
                     "Content-Type": "application/json",
                 },
-            }
+            },
         );
     } finally {
         await PrismaClientManager.shutdown();

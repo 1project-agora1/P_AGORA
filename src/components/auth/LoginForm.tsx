@@ -3,6 +3,7 @@
 import { LoginValidator } from "@/lib/Validator";
 import Link from "next/link";
 import React from "react";
+import { toast } from "react-toastify";
 import { z } from "zod";
 
 export default function LoginForm({
@@ -34,16 +35,16 @@ export default function LoginForm({
                 window.location.reload(); // 페이지 새로고침
             } else {
                 const errorData = await res.json();
-                alert(errorData.message || "로그인에 실패했습니다");
+                toast.error(errorData.message || "로그인에 실패했습니다");
             }
         } catch (error) {
             if (error instanceof z.ZodError) {
                 // Zod 에러 메시지 처리
                 const errorMessage = error.errors[0]?.message;
-                alert(errorMessage || "입력값을 확인해주세요");
+                toast.error(errorMessage || "입력값을 확인해주세요");
                 return;
             }
-            alert("예상치 못한 오류가 발생했습니다");
+            toast.error("예상치 못한 오류가 발생했습니다");
         }
     };
 
