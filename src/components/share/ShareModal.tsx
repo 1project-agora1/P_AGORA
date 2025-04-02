@@ -2,6 +2,8 @@
 
 import { QRCodeSVG } from "qrcode.react";
 import { useRef, useState } from "react";
+import { FaRegCopy } from "react-icons/fa";
+import { toast, ToastContainer } from "react-toastify";
 import SubmitButton from "../button/SubmitButton";
 
 export const ShareModal = () => {
@@ -14,8 +16,7 @@ export const ShareModal = () => {
 
     const handleCopy = async () => {
         await navigator.clipboard.writeText(currentUrl);
-        setCopied(true);
-        setTimeout(() => setCopied(false), 2000);
+        toast.success("URL이 복사되었습니다.");
     };
     const downloadQR = () => {
         const svg = qrRef.current;
@@ -43,6 +44,7 @@ export const ShareModal = () => {
     //TODO : 소셜 공유하기 추가?
     return (
         <>
+            <ToastContainer />
             <SubmitButton
                 buttonName="공유하기"
                 onClick={() => setIsOpen(true)}
@@ -73,7 +75,8 @@ export const ShareModal = () => {
                                 className="bg-gray-200 px-3 py-2 rounded hover:bg-gray-300 text-sm"
                                 onClick={handleCopy}
                             >
-                                {copied ? "복사됨!" : "복사"}
+                                <FaRegCopy />
+
                             </button>
                         </div>
 
