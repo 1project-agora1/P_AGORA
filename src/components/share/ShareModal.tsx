@@ -8,6 +8,7 @@ import SubmitButton from "../button/SubmitButton";
 
 export const ShareModal = () => {
     const [isOpen, setIsOpen] = useState(false);
+    const [copied, setCopied] = useState(false);
     const qrRef = useRef<SVGSVGElement | null>(null);
 
     const currentUrl =
@@ -75,6 +76,7 @@ export const ShareModal = () => {
                                 onClick={handleCopy}
                             >
                                 <FaRegCopy />
+
                             </button>
                         </div>
 
