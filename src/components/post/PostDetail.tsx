@@ -25,7 +25,7 @@ const PostDetail: React.FC<PostDetailType> = ({ data }) => {
     try {
         content = JSON.parse(data.content);
     } catch (error) {
-        console.error("Content parsing error:", error);
+        toast.error("게시물 내용을 불러오는 데 실패했습니다.");
         return <div>게시물 내용을 불러올 수 없습니다.</div>;
     }
     const likeHandler = (token: string) => {
@@ -33,7 +33,6 @@ const PostDetail: React.FC<PostDetailType> = ({ data }) => {
             toast.warning("로그인이 필요합니다.");
             return;
         }
-        console.log(liked);
         if (liked) {
             handleUnlikePost({
                 userToken: user.token,
