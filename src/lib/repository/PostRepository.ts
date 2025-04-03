@@ -88,4 +88,30 @@ export class PostRepository {
         }
         return convertBigIntToString(response);
     }
+
+    async isLikedPost(data: PostLikeRequest) {
+        const response = await this.query.isLikedPost(data);
+        if (response == null) {
+            console.log("isLikedPost response is null");
+            return {};
+        }
+        return response;
+    }
+
+    async setLikePostLog(data: PostLikeRequest) {
+        const response = await this.query.setLikePostLog(data);
+        if (response == null) {
+            console.log("setLikePostLog response is null");
+            return {};
+        }
+        return convertBigIntToString(response);
+    }
+    async setUnLikePostLog(data: PostLikeRequest) {
+        const response = await this.query.setUnLikePostLog(data);
+        if (response == null) {
+            console.log("setUnLikePostLog response is null");
+            return {};
+        }
+        return convertBigIntToString(response);
+    }
 }

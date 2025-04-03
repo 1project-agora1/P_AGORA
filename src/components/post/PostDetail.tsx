@@ -7,9 +7,11 @@ import { ko } from "date-fns/locale";
 import React, { useEffect, useState } from "react";
 import { BiLike } from "react-icons/bi";
 import { BsPeople } from "react-icons/bs";
+import { toast } from "react-toastify";
 
 const PostDetail: React.FC<PostDetailType> = ({ data }) => {
-    const { handleLikePost, handleUnlikePost, handleViewPost } = useLikePost();
+    const { handleLikePost, handleUnlikePost, handleViewPost, isLikePost } =
+        useLikePost();
     const { user } = useUser();
     const [like, setLike] = useState<number>(data.likes);
     const [views, setViews] = useState<number>(data.views);
@@ -23,12 +25,12 @@ const PostDetail: React.FC<PostDetailType> = ({ data }) => {
     try {
         content = JSON.parse(data.content);
     } catch (error) {
-        console.error("Content parsing error:", error);
+        toast.error("게시물 내용을 불러오는 데 실패했습니다.");
         return <div>게시물 내용을 불러올 수 없습니다.</div>;
     }
     const likeHandler = (token: string) => {
         if (user.token === "") {
-            alert("로그인이 필요합니다.");
+            toast.warning("로그인이 필요합니다.");
             return;
         }
         if (liked) {
@@ -48,7 +50,6 @@ const PostDetail: React.FC<PostDetailType> = ({ data }) => {
     };
     useEffect(() => {
         if (!viewed) {
-            console.log("조회수 증가");
             handleViewPost({ postToken: data.token }).then((res: any) => {
                 if (res.status === 200) {
                     setViews((prev) => prev + 1);
@@ -56,6 +57,14 @@ const PostDetail: React.FC<PostDetailType> = ({ data }) => {
             });
             setViewed(true); // 조회 상태를 true로 설정
         }
+        isLikePost({
+            userToken: user.token,
+            postToken: data.token,
+        })?.then((res: any) => {
+            if (res.success) {
+                setLiked(res.data.count > 0);
+            }
+        });
     }, [data.token, viewed]); // 의존성 배열에 data.token과 viewed 추가
 
     return (
@@ -132,7 +141,7 @@ const PostDetail: React.FC<PostDetailType> = ({ data }) => {
                                     );
                                 }
                                 return null;
-                            }
+                            },
                         )}
                     </div>
                 ))}
