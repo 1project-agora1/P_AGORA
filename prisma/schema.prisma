@@ -27,6 +27,12 @@ model User {
 
   @@map("user")
 }
+// UserRole
+enum UserRole {
+  ROLE_DEVELOPER
+  ROLE_ADMIN
+  ROLE_USER
+}
 
 // ---------------------------------------------------------------------------------------------------------------------
 // Post
@@ -49,6 +55,8 @@ model Post {
   @@map("post")
 }
 
+// ---------------------------------------------------------------------------------------------------------------------
+// Channel
 model Channel {
   id           BigInt        @id @default(autoincrement())
   token        String        @unique
@@ -95,12 +103,8 @@ model ViewLog {
   @@map("view_log")
 }
 
-enum UserRole {
-  ROLE_DEVELOPER
-  ROLE_ADMIN
-  ROLE_USER
-}
-
+// ---------------------------------------------------------------------------------------------------------------------
+// LikeLog
 model like_log {
   token      String   @unique
   user_token String
