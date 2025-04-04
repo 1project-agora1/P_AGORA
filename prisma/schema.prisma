@@ -14,19 +14,21 @@ datasource db {
 // ---------------------------------------------------------------------------------------------------------------------
 // User
 model User {
-  id             BigInt   @id @default(autoincrement())
-  token          String   @unique
-  nickname       String   
-  password       String   @db.VarChar(128)
-  email          String   @unique
-  email_verified Boolean  @default(false)
-  role           UserRole @default(ROLE_USER)
-  createdAt      DateTime @default(now()) @map("created_at")
-  updatedAt      DateTime @updatedAt @map("updated_at")
+  id             BigInt    @id @default(autoincrement())
+  token          String    @unique
+  nickname       String
+  password       String    @db.VarChar(128)
+  email          String    @unique
+  email_verified Boolean   @default(false)
+  role           UserRole  @default(ROLE_USER)
+  createdAt      DateTime  @default(now()) @map("created_at")
+  updatedAt      DateTime  @updatedAt @map("updated_at")
   posts          Post[]
+  Comment        Comment[]
 
   @@map("user")
 }
+
 // UserRole
 enum UserRole {
   ROLE_DEVELOPER
@@ -49,6 +51,7 @@ model Post {
   updatedAt          DateTime    @updatedAt @map("updated_at")
   channel_item       ChannelItem @relation(fields: [channel_item_token], references: [token])
   user               User        @relation(fields: [user_token], references: [token])
+  comments           Comment[]
 
   @@index([channel_item_token], map: "post_channel_item_token_fkey")
   @@index([user_token], map: "post_user_token_fkey")
@@ -116,7 +119,30 @@ model like_log {
   @@map("like_log")
 }
 
+// ---------------------------------------------------------------------------------------------------------------------
+model Comment {
+  id                   BigInt  @id @default(autoincrement())
+  token                String  @unique
+  user_token           String
+  post_token           String
+  parent_comment_token String?
 
+  content   String
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  post           Post      @relation(fields: [post_token], references: [token])
+  user           User      @relation(fields: [user_token], references: [token])
+  parent_comment Comment?  @relation("ParentComment", fields: [parent_comment_token], references: [token])
+  child_comments Comment[] @relation("ParentComment")
+
+  @@index([user_token], map: "comment_user_token_fkey")
+  @@index([post_token], map: "comment_post_token_fkey")
+  @@index([parent_comment_token], map: "comment_parent_comment_token_fkey")
+  @@map("comment")
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
 model SYS_USER {
   SU_ID    String    @id @db.VarChar(50)
   SU_PW    String?   @db.VarChar(45)
