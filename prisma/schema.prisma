@@ -126,11 +126,9 @@ model Comment {
   user_token           String
   post_token           String
   parent_comment_token String?
-
   content   String
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
-
   post           Post      @relation(fields: [post_token], references: [token])
   user           User      @relation(fields: [user_token], references: [token])
   parent_comment Comment?  @relation("ParentComment", fields: [parent_comment_token], references: [token])
