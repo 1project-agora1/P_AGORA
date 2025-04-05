@@ -9,3 +9,7 @@ export interface CommentUpdateRequest {
     token: string;
     content: string;
 }
+
+export interface CommentDeleteRequest {
+    token: string;
+}

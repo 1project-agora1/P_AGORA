@@ -37,4 +37,13 @@ export class CommentQuery {
             },
         });
     }
+
+    async deleteComment(token: string) {
+        const prisma = PrismaClientManager.getClient();
+        return prisma.comment.delete({
+            where: {
+                token: token,
+            },
+        });
+    }
 }

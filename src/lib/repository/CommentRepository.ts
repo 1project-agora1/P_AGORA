@@ -1,6 +1,7 @@
 import { CommentQuery } from "@/lib/query/CommentQuery";
 import {
     CommentCreateRequest,
+    CommentDeleteRequest,
     CommentUpdateRequest,
 } from "@/lib/request/CommentRequest";
 import { convertBigIntToString } from "@/util/ConvertBigIntToString";
@@ -22,6 +23,14 @@ export class CommentRepository {
 
     async updateComment(data: CommentUpdateRequest) {
         const response = await this.query.updateComment(data);
+        if (response == null) {
+            return null;
+        }
+        return convertBigIntToString(response);
+    }
+
+    async deleteComment(data: CommentDeleteRequest) {
+        const response = await this.query.deleteComment(data.token);
         if (response == null) {
             return null;
         }
