@@ -2,6 +2,7 @@ import { ApiResponse } from "@/lib/ApiResponse";
 import { PrismaClientManager } from "@/lib/client/PrismaClientManager";
 import { PostRepository } from "@/lib/repository/PostRepository";
 
+// TODO: DELETE->POST 후에 상태 변경으로 안 보이게 처리해서 삭제 기능 구현 필요
 export async function DELETE(request: Request) {
     try {
         const postRepository = new PostRepository();
@@ -18,7 +19,7 @@ export async function DELETE(request: Request) {
                     headers: {
                         "Content-Type": "application/json",
                     },
-                }
+                },
             );
         }
 
@@ -31,7 +32,7 @@ export async function DELETE(request: Request) {
             } as ApiResponse<typeof newPost>,
             {
                 status: 200,
-            }
+            },
         );
     } catch (error) {
         console.error("게시물 삭제 에러", error);
@@ -45,7 +46,7 @@ export async function DELETE(request: Request) {
                 headers: {
                     "Content-Type": "application/json",
                 },
-            }
+            },
         );
     } finally {
         await PrismaClientManager.shutdown();
