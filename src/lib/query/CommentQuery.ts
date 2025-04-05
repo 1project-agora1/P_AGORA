@@ -1,4 +1,7 @@
-import { CommentCreateRequest } from "@/lib/request/CommentRequest";
+import {
+    CommentCreateRequest,
+    CommentUpdateRequest,
+} from "@/lib/request/CommentRequest";
 import { PrismaClientManager } from "@/lib/client/PrismaClientManager";
 import { generateRandomToken } from "@/util/RandomToken";
 
@@ -19,6 +22,19 @@ export class CommentQuery {
         };
         return prisma.comment.create({
             data: commentData,
+        });
+    }
+
+    // 댓글 수정
+    async updateComment(data: CommentUpdateRequest) {
+        const prisma = PrismaClientManager.getClient();
+        return prisma.comment.update({
+            where: {
+                token: data.token,
+            },
+            data: {
+                content: data.content,
+            },
         });
     }
 }

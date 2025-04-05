@@ -1,5 +1,8 @@
 import { CommentQuery } from "@/lib/query/CommentQuery";
-import { CommentCreateRequest } from "@/lib/request/CommentRequest";
+import {
+    CommentCreateRequest,
+    CommentUpdateRequest,
+} from "@/lib/request/CommentRequest";
 import { convertBigIntToString } from "@/util/ConvertBigIntToString";
 
 export class CommentRepository {
@@ -11,6 +14,14 @@ export class CommentRepository {
 
     async createComment(data: CommentCreateRequest) {
         const response = await this.query.createComment(data);
+        if (response == null) {
+            return null;
+        }
+        return convertBigIntToString(response);
+    }
+
+    async updateComment(data: CommentUpdateRequest) {
+        const response = await this.query.updateComment(data);
         if (response == null) {
             return null;
         }

@@ -4,3 +4,8 @@ export interface CommentCreateRequest {
     parent_comment_token?: string;
     content: string;
 }
+
+export interface CommentUpdateRequest {
+    token: string;
+    content: string;
+}
