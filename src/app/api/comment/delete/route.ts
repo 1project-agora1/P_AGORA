@@ -1,41 +1,26 @@
 import { ApiResponse } from "@/lib/ApiResponse";
 import { PrismaClientManager } from "@/lib/client/PrismaClientManager";
-import { PostRepository } from "@/lib/repository/PostRepository";
+import { CommentRepository } from "@/lib/repository/CommentRepository";
+import { CommentDeleteRequest } from "@/lib/request/CommentRequest";
 
 // TODO: DELETE->POST 후에 상태 변경으로 안 보이게 처리해서 삭제 기능 구현 필요
 export async function DELETE(request: Request) {
     try {
-        const postRepository = new PostRepository();
-        const url = new URL(request.url);
-        const token = url.searchParams.get("token");
-        if (!token) {
-            return Response.json(
-                {
-                    success: false,
-                    error: "토큰이 필요합니다.",
-                } as ApiResponse,
-                {
-                    status: 400,
-                    headers: {
-                        "Content-Type": "application/json",
-                    },
-                },
-            );
-        }
-
-        const newPost = await postRepository.deletePost(token);
+        const data: CommentDeleteRequest = await request.json();
+        const commentRepository = new CommentRepository();
+        const deletedComment = await commentRepository.deleteComment(data);
 
         return Response.json(
             {
                 success: true,
-                data: newPost,
-            } as ApiResponse<typeof newPost>,
+                data: deletedComment,
+            } as ApiResponse<typeof deletedComment>,
             {
                 status: 200,
             },
         );
     } catch (error) {
-        console.error("게시물 삭제 에러", error);
+        console.error("댓글 삭제 에러", error);
         return Response.json(
             {
                 success: false,
