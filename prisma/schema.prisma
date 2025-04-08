@@ -14,15 +14,15 @@ datasource db {
 // ---------------------------------------------------------------------------------------------------------------------
 // User
 model User {
-  id             BigInt    @id @default(autoincrement())
-  token          String    @unique
-  nickname       String
-  password       String    @db.VarChar(128)
-  email          String    @unique
-  email_verified Boolean   @default(false)
-  role           UserRole  @default(ROLE_USER)
-  createdAt      DateTime  @default(now()) @map("created_at")
-  updatedAt      DateTime  @updatedAt @map("updated_at")
+  id             BigInt   @id @default(autoincrement())
+  token          String   @unique
+  nickname       String   @unique
+  password       String   @db.VarChar(128)
+  email          String   @unique
+  email_verified Boolean  @default(false)
+  role           UserRole @default(ROLE_USER)
+  createdAt      DateTime @default(now()) @map("created_at")
+  updatedAt      DateTime @updatedAt @map("updated_at")
   posts          Post[]
   Comment        Comment[]
 
