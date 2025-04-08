@@ -1,9 +1,10 @@
 "use client";
 
 import { PostListMainForm } from "@/components/post/PostListMainForm";
+import { useChannelItem } from "@/lib/hooks/channelHook";
 import { CookiesProvider } from "next-client-cookies";
 import { useRouter, useSearchParams } from "next/navigation";
-import { Suspense, useEffect } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { toast } from "react-toastify";
 
 // 채널 아이템 데이터 인터페이스
@@ -12,17 +13,20 @@ interface ChannelItemData {
 }
 
 export default function Home() {
-    // TODO: 메인 페이지에 보여줄 채널 아이템 로직 추가 예정 - 현재는 로컬 DB 더미 데이터 사용
-    // TODO: 추가 페이지 할당 예정
-    const firstToken: string = "6413bfc4dce2df9";
-    const mainChannels: ChannelItemData[] = [
-        { token: firstToken },
-        { token: "cc00c36802fddfe" },
-    ];
+    const { channelItemTokenList } = useChannelItem();
+
+    const [mainChannels, setMainChannels] = useState<ChannelItemData[]>([]);
     const router = useRouter();
     const searchParams = useSearchParams();
     const success = searchParams.get("success");
     useEffect(() => {
+        const fetchChannelItemTokenList = async () => {
+            const response = await channelItemTokenList();
+            if (response?.data) {
+                setMainChannels(response.data as ChannelItemData[]);
+            }
+        };
+        fetchChannelItemTokenList();
         if (success) {
             toast.success("회원가입이 완료되었습니다!");
             router.push("/");
