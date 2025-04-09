@@ -48,6 +48,12 @@ export class PopularPostJob {
                 likes: true,
                 channel_item_token: true,
                 createdAt: true,
+                channel_item: {
+                    select: {
+                        token: true,
+                        parent_menu_token: true,
+                    },
+                },
             },
         });
 
@@ -63,8 +69,8 @@ export class PopularPostJob {
             return {
                 token: post.token,
                 post_token: post.token,
-                parent_menu_token: post.channel_item_token,
-                submenu_token: post.channel_item_token,
+                parent_menu_token: post.channel_item.parent_menu_token,
+                submenu_token: post.channel_item.token,
                 title: post.title,
                 view_count: post.views,
                 like_count: post.likes,
