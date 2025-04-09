@@ -75,4 +75,13 @@ export class ChannelQeury {
             },
         });
     }
+
+    async getChannelItemList() {
+        const prisma = PrismaClientManager.getClient();
+        return await prisma.channelItem.findMany({
+            select: {
+                token: true,
+            },
+        });
+    }
 }
