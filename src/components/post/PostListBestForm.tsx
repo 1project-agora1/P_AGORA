@@ -1,9 +1,8 @@
 "use client";
 
 import ErrorDisplay from "@/components/ErrorDisplay";
-import { ApiResponse } from "@/lib/ApiResponse";
-import { PostListResponse } from "@/lib/response/PostResponse";
-import { ChannelItemData } from "@/lib/types/ChannelType";
+import { usePost } from "@/lib/hooks/postHook";
+import { PopularPost } from "@/lib/types/PopularPostType";
 import {
     ClockIcon,
     DocumentIcon,
@@ -16,63 +15,18 @@ import { ko } from "date-fns/locale";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 
-// 메인 페이지 게시물 리스트 폼
-export function PostListMainForm({
-    channelItem,
-}: {
-    channelItem: ChannelItemData;
-}) {
-    return (
-        <ChannelItemSection key={channelItem.token} token={channelItem.token} />
-    );
-}
-
-function ChannelItemSection({ token }: { token: string }) {
-    const [posts, setPosts] = useState<PostListResponse>();
-    const [channelItemInfo, setChannelItemInfo] = useState<{
-        channelToken: string;
-        name: string | null;
-    }>();
+export function PostListBestForm() {
+    const [posts, setPosts] = useState<PopularPost[]>();
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
     const SKELETON_ITEMS = Array(3).fill(null);
+    const { getPopularPostsHook } = usePost();
+
     useEffect(() => {
         const fetchPreviewData = async () => {
             try {
-                if (!token) {
-                    throw new Error("유효하지 않은 게시판 토큰");
-                }
-
-                const resPost = await fetch(`/api/post/list/preview/${token}`);
-                if (!resPost.ok) {
-                    throw new Error(`HTTP ${resPost.status}`);
-                }
-
-                const contentType = resPost.headers.get("content-type");
-                if (!contentType?.includes("application/json")) {
-                    throw new Error("유효하지 않은 응답 형식");
-                }
-
-                const result: ApiResponse<PostListResponse> =
-                    await resPost.json();
-                if (!result.success || !result.data) {
-                    throw new Error(result.error || "데이터 불러오기 실패");
-                }
-
-                const resChannelItemInfo = await fetch(
-                    `/api/channel/item/info/${token}`,
-                );
-                const { data } = await resChannelItemInfo.json();
-                if (!data) {
-                    throw new Error("게시판 이름 불러오기 실패");
-                }
-
-                setPosts(result.data);
-                setChannelItemInfo({
-                    channelToken: data.channelToken,
-                    name: data.name,
-                });
-
+                const resPost = await getPopularPostsHook();
+                setPosts(resPost?.data.data);
                 setError(null);
             } catch (err) {
                 const errorMessage =
@@ -85,19 +39,13 @@ function ChannelItemSection({ token }: { token: string }) {
         };
 
         fetchPreviewData();
-    }, [token]);
+    }, []);
 
     return (
         <div className="bg-white rounded-2xl p-2 shadow-sm border border-gray-150">
-            <Link
-                href={
-                    channelItemInfo?.channelToken
-                        ? `/channel/${channelItemInfo.channelToken}/${token}`
-                        : "#"
-                }
-            >
+            <Link href={`/channel/best`}>
                 <h3 className="text-lg font-semibold mb-3 text-gray-700 hover:text-blue-600 transition-colors cursor-pointer">
-                    {channelItemInfo?.name || "채널 이름 로드 중..."}
+                    실시간 인기글
                 </h3>
             </Link>
 
@@ -116,7 +64,7 @@ function ChannelItemSection({ token }: { token: string }) {
                     message={error}
                     retryFn={() => window.location.reload()}
                 />
-            ) : posts?.posts.length === 0 ? (
+            ) : posts?.length === 0 ? (
                 <div className="text-center py-3">
                     <DocumentIcon className="w-7 h-7 mx-auto text-gray-400" />
                     <p className="text-gray-500 text-xs mt-1.5">
@@ -125,39 +73,28 @@ function ChannelItemSection({ token }: { token: string }) {
                 </div>
             ) : (
                 <div className="space-y-2">
-                    {posts?.posts.map((post) => (
+                    {posts?.map((post) => (
                         <article
                             key={post.token}
                             className="p-2 border border-gray-200 rounded-md
                             hover:bg-gray-50 transition-colors cursor-pointer flex justify-between"
                         >
-                            {channelItemInfo?.channelToken ? (
-                                <Link
-                                    href={
-                                        channelItemInfo?.channelToken
-                                            ? `channel/${channelItemInfo.channelToken}/${token}/${post.token}`
-                                            : "#"
-                                    }
-                                >
-                                    <div className="flex justify-between items-center w-full">
-                                        <h4 className="text-sm truncate font-medium text-gray-800">
-                                            {post.title}
-                                        </h4>
-                                    </div>
-                                </Link>
-                            ) : (
+                            <Link
+                                href={`channel/${post.parent_menu_token}/${post.submenu_token}/${post.token}`}
+                            >
                                 <div className="flex justify-between items-center w-full">
-                                    <h4 className="text-sm truncate font-medium text-gray-400">
-                                        링크 생성 중...
+                                    <h4 className="text-sm truncate font-medium text-gray-800">
+                                        {post.title}
                                     </h4>
                                 </div>
-                            )}
+                            </Link>
+
                             <div className="flex gap-1.5">
                                 {/* 조회수 영역 */}
                                 <div className="flex items-center gap-1 text-gray-500">
                                     <EyeIcon className="w-3.5 h-3.5 " />
                                     <span className="text-[11px]">
-                                        {post.views}
+                                        {post.view_count}
                                     </span>
                                 </div>
 
@@ -165,7 +102,7 @@ function ChannelItemSection({ token }: { token: string }) {
                                 <div className="flex items-center gap-1 text-gray-500 z-999">
                                     <HeartIcon className="w-3.5 h-3.5" />
                                     <span className="text-[11px]">
-                                        {post.likes}
+                                        {post.like_count}
                                     </span>
                                 </div>
 
@@ -174,7 +111,7 @@ function ChannelItemSection({ token }: { token: string }) {
                                     <ClockIcon className="w-3.5 h-3.5" />
                                     <span className="text-[11px]">
                                         {formatDistanceToNow(
-                                            new Date(post.createdAt),
+                                            new Date(post.postCreatedAt),
                                             {
                                                 addSuffix: true,
                                                 locale: ko,

@@ -1,11 +1,20 @@
 import { PopularPostRepository } from "@/lib/repository/PopularPostRepository";
+import { PostPopularRequest } from "@/lib/request/PostRequest";
 import { NextResponse } from "next/server";
 
-export async function GET() {
+export async function GET(request: Request) {
     try {
-        const repository = new PopularPostRepository();
-        const popularPosts = await repository.getPopularPosts();
+        const url = new URL(request.url);
+        const page = parseInt(url.searchParams.get("page") || "1", 10);
+        const pageSize = parseInt(url.searchParams.get("pageSize") || "10", 10);
 
+        const repository = new PopularPostRepository();
+
+        const searchParams: PostPopularRequest = {
+            page,
+            pageSize,
+        };
+        const popularPosts = await repository.getPopularPosts(searchParams);
         return NextResponse.json({
             status: 200,
             message: "인기글 조회 성공",

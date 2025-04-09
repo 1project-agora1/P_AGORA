@@ -1,5 +1,5 @@
 "use client";
-import { useLikePost } from "@/lib/hooks/postHook";
+import { useLikePost } from "@/lib/hooks/postLikeHook";
 import { useUser } from "@/lib/hooks/useUser";
 import { PostDetailType } from "@/lib/types/PostType";
 import { formatDistanceToNow } from "date-fns";
