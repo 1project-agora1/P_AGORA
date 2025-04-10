@@ -20,3 +20,8 @@ export interface PostLikeRequest {
 export interface PostViewRequest {
     postToken: string;
 }
+
+export interface PostPopularRequest {
+    page: number;
+    pageSize: number;
+}

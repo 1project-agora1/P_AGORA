@@ -1,5 +1,6 @@
 "use client";
 
+import { PostListBestForm } from "@/components/post/PostListBestForm";
 import { PostListMainForm } from "@/components/post/PostListMainForm";
 import { useChannelItem } from "@/lib/hooks/channelHook";
 import { CookiesProvider } from "next-client-cookies";
@@ -12,13 +13,13 @@ interface ChannelItemData {
     token: string;
 }
 
-export default function Home() {
+function HomeContent() {
     const { channelItemTokenList } = useChannelItem();
-
     const [mainChannels, setMainChannels] = useState<ChannelItemData[]>([]);
     const router = useRouter();
     const searchParams = useSearchParams();
     const success = searchParams.get("success");
+
     useEffect(() => {
         const fetchChannelItemTokenList = async () => {
             const response = await channelItemTokenList();
@@ -37,6 +38,7 @@ export default function Home() {
         <main className="container mx-auto p-4 bg-white min-h-screen">
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 p-4">
                 {/* 반응형 col 기본값 : 모바일(1col), 태블릿(2col), 데스크탑(3col)*/}
+                <PostListBestForm />
                 {mainChannels.map((channel) => (
                     <Suspense
                         key={channel.token}
@@ -55,5 +57,13 @@ export default function Home() {
                 ))}
             </div>
         </main>
+    );
+}
+
+export default function Home() {
+    return (
+        <Suspense fallback={<div>로딩중...</div>}>
+            <HomeContent />
+        </Suspense>
     );
 }

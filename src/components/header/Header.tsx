@@ -69,7 +69,7 @@ export default function Header({
 
     const toggleChannel = (channelToken: string) => {
         setActiveChannel((prevChannel) =>
-            prevChannel === channelToken ? null : channelToken
+            prevChannel === channelToken ? null : channelToken,
         );
     };
 
@@ -110,47 +110,61 @@ export default function Header({
                                 <Skeleton className="w-24" />
                             </div>
                         ) : (
-                            channels.map((channel) => (
-                                <div
-                                    key={channel.token}
-                                    className="relative hidden md:flex flex-col"
-                                >
+                            <>
+                                {channels.map((channel) => (
                                     <div
-                                        className="hover:text-primary font-bold cursor-pointer mx-4 text-xl"
-                                        onClick={() =>
-                                            toggleChannel(channel.token)
-                                        }
+                                        key={channel.token}
+                                        className="relative hidden md:flex flex-col"
                                     >
-                                        {channel.menu_name}
-                                    </div>
-                                    {activeChannel === channel.token &&
-                                        channel.channelItems && (
-                                            <div className="absolute flex flex-col w-[100px] top-full mt-2 bg-white shadow-lg rounded-md transition-all duration-300 ease-in-out transform scale-95 origin-top">
-                                                {channel.channelItems.map(
-                                                    (item) => (
-                                                        <div
-                                                            key={item.token}
-                                                            className="hover:text-primaryThin cursor-pointer text-nowrap text-ellipsis overflow-hidden px-4 py-2"
-                                                        >
-                                                            <Link
-                                                                onClick={() =>
-                                                                    setActiveChannel(
-                                                                        null
-                                                                    )
-                                                                }
-                                                                href={`/channel/${channel.token}/${item.token}`}
+                                        <div
+                                            className="hover:text-primary font-bold cursor-pointer mx-4 text-xl"
+                                            onClick={() =>
+                                                toggleChannel(channel.token)
+                                            }
+                                        >
+                                            {channel.menu_name}
+                                        </div>
+                                        {activeChannel === channel.token &&
+                                            channel.channelItems && (
+                                                <div className="absolute flex flex-col w-[100px] top-full mt-2 bg-white shadow-lg rounded-md transition-all duration-300 ease-in-out transform scale-95 origin-top">
+                                                    {channel.channelItems.map(
+                                                        (item) => (
+                                                            <div
+                                                                key={item.token}
+                                                                className="hover:text-primaryThin cursor-pointer text-nowrap text-ellipsis overflow-hidden px-4 py-2"
                                                             >
-                                                                {
-                                                                    item.submenu_name
-                                                                }
-                                                            </Link>
-                                                        </div>
-                                                    )
-                                                )}
-                                            </div>
-                                        )}
+                                                                <Link
+                                                                    onClick={() =>
+                                                                        setActiveChannel(
+                                                                            null,
+                                                                        )
+                                                                    }
+                                                                    href={`/channel/${channel.token}/${item.token}`}
+                                                                >
+                                                                    {
+                                                                        item.submenu_name
+                                                                    }
+                                                                </Link>
+                                                            </div>
+                                                        ),
+                                                    )}
+                                                </div>
+                                            )}
+                                    </div>
+                                ))}
+                                <div className="relative hidden md:flex flex-col">
+                                    <Link href={`/channel/best`}>
+                                        <div className="hover:text-primary font-bold cursor-pointer mx-4 text-xl">
+                                            베스트
+                                        </div>
+                                    </Link>
                                 </div>
-                            ))
+                                <div className="relative hidden md:flex flex-col">
+                                    <div className="hover:text-primary font-bold cursor-pointer mx-4 text-xl">
+                                        공지사항
+                                    </div>
+                                </div>
+                            </>
                         )}
                     </div>
                     {/* 회원 정보 */}

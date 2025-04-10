@@ -1,5 +1,5 @@
 import { logger } from "@/lib/logger";
-import { PrismaClient } from "@prisma/client";
+import { PopularPostRepository } from "@/lib/repository/PopularPostRepository";
 
 // src/batch/jobs/popularPostJob.ts
 export class PopularPostJob {
@@ -11,6 +11,7 @@ export class PopularPostJob {
     };
 
     private static readonly TIME_DECAY = 1.8;
+    private static readonly repository = new PopularPostRepository();
 
     static async execute() {
         const startTime = Date.now();
@@ -32,30 +33,12 @@ export class PopularPostJob {
     private static async processPopularPosts() {
         // 최근 7일 게시물만 처리
         const startDate = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
+
         // 기존 데이터 삭제
-        const prisma = new PrismaClient();
-        await prisma.popularPost.deleteMany();
+        await this.repository.deleteAllPopularPosts();
 
         // 게시글 집계
-        const posts = await prisma.post.findMany({
-            where: {
-                createdAt: { gte: startDate },
-            },
-            select: {
-                token: true,
-                title: true,
-                views: true,
-                likes: true,
-                channel_item_token: true,
-                createdAt: true,
-                channel_item: {
-                    select: {
-                        token: true,
-                        parent_menu_token: true,
-                    },
-                },
-            },
-        });
+        const posts = await this.repository.getRecentPosts(startDate);
 
         // 점수 계산 및 저장
         const popularPosts = posts.map((post) => {
@@ -64,7 +47,9 @@ export class PopularPostJob {
                 likes: post.likes,
             });
             const finalScore = this.applyTimeDecay(baseScore, post.createdAt);
-            console.log("finalScore", finalScore);
+            logger.debug(
+                `[PopularPostJob] 게시물 ${post.token}의 최종 점수: ${finalScore}`,
+            );
 
             return {
                 token: post.token,
@@ -75,14 +60,13 @@ export class PopularPostJob {
                 view_count: post.views,
                 like_count: post.likes,
                 score: finalScore,
+                user_nickname: post.user.nickname,
                 postCreatedAt: post.createdAt,
             };
         });
 
         // 배치 삽입
-        await prisma.popularPost.createMany({
-            data: popularPosts,
-        });
+        await this.repository.createManyPopularPosts(popularPosts);
 
         logger.info(
             `[PopularPostJob] 총 ${popularPosts.length}개의 인기글 처리 완료`,
