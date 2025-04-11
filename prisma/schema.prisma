@@ -158,3 +158,25 @@ model SYS_USER {
 
   @@ignore
 }
+
+// ---------------------------------------------------------------------------------------------------------------------
+// 인기글 통계 테이블
+model PopularPost {
+  id        BigInt    @id @default(autoincrement())
+  token     String @unique
+  parent_menu_token String
+  submenu_token String
+  post_token String
+  view_count Int     @default(0)
+  like_count Int     @default(0)
+  comment_count Int     @default(0)  //댓글 기능 완료 시 적용
+  score Float     @default(0)
+  title String
+  user_nickname String
+  postCreatedAt DateTime
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime  @updatedAt @map("updated_at")
+
+
+  @@map("popular_post")
+}

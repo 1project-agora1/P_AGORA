@@ -20,7 +20,7 @@ export class ChannelRepository {
     //채널 리스트 저장
     async createItemChannel(request: ChannelItemCreateRequest) {
         return convertBigIntToString(
-            await this.query.createItemChannel(request)
+            await this.query.createItemChannel(request),
         );
     }
 
@@ -35,5 +35,9 @@ export class ChannelRepository {
             return [];
         }
         return convertBigIntToString(response);
+    }
+    //채널 리스트 조회
+    async getChannelItemList() {
+        return convertBigIntToString(await this.query.getChannelItemList());
     }
 }

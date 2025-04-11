@@ -52,3 +52,7 @@ package-lock.json
 
 #prisma
 /prisma/migrations/
+
+#log
+/logs/
+logs/combined.log

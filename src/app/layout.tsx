@@ -13,7 +13,7 @@ export const metadata: Metadata = {
 
 async function fetchChannels(): Promise<Channel[]> {
     const response = await fetch(
-        `${process.env.NEXT_PUBLIC_ORIGIN_URL}/api/channel/list`
+        `${process.env.NEXT_PUBLIC_ORIGIN_URL}/api/channel/list`,
     );
     const data: ApiResponse<Channel[]> = await response.json();
 

@@ -1,10 +1,6 @@
-import {
-    PostLikeRequest,
-    PostPopularRequest,
-    PostViewRequest,
-} from "../request/PostRequest";
+import { PostLikeRequest, PostViewRequest } from "../request/PostRequest";
 import restClient from "../restClient";
-import { PopularPostResponse } from "../types/PopularPostType";
+import { ChannelItemData } from "../types/ChannelType";
 
 export const likePost = async (postLikeToken: PostLikeRequest) => {
     return restClient.post(`/api/post/like`, postLikeToken);
@@ -24,14 +20,8 @@ export const isLikedPost = async (postLikeToken: PostLikeRequest) => {
     );
 };
 
-export const getPopularPosts = async (): Promise<PopularPostResponse> => {
-    return restClient.get(`/api/post/popular`);
-};
-
-export const getPopularPostsList = async (
-    popularPost: PostPopularRequest,
-): Promise<PopularPostResponse> => {
-    return restClient.get(
-        `/api/post/popular?page=${popularPost.page}&pageSize=${popularPost.pageSize}`,
-    );
+export const getChannelItemTokenList = async (): Promise<{
+    data: ChannelItemData[];
+}> => {
+    return restClient.get(`/api/channel/item/list`);
 };
