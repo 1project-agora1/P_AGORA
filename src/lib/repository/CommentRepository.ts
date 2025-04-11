@@ -30,7 +30,15 @@ export class CommentRepository {
     }
 
     async deleteComment(data: CommentDeleteRequest) {
-        const response = await this.query.deleteComment(data.token);
+        const response = await this.query.deleteComment(data);
+        if (response == null) {
+            return null;
+        }
+        return convertBigIntToString(response);
+    }
+
+    async findCommentsFromPost(token: string) {
+        const response = await this.query.getComments(token);
         if (response == null) {
             return null;
         }

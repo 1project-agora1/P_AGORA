@@ -6,10 +6,12 @@ export interface CommentCreateRequest {
 }
 
 export interface CommentUpdateRequest {
-    token: string;
+    user_token: string;
+    comment_token: string;
     content: string;
 }
 
 export interface CommentDeleteRequest {
-    token: string;
+    user_token: string;
+    comment_token: string;
 }

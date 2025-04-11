@@ -3,9 +3,9 @@
     "version": "0.1.0",
     "private": true,
     "scripts": {
-        "dev": "NODE_ENV=development next dev --turbopack",
-        "build": "NODE_ENV=production next build",
-        "start": "NODE_ENV=production next start",
+        "dev": "cross-env NODE_ENV=development next dev --turbopack",
+        "build": "cross-env NODE_ENV=production next build",
+        "start": "cross-env NODE_ENV=production next start",
         "lint:fix": "next lint --fix",
         "prisma:generate": "dotenv -e .env.local -- npx prisma generate",
         "prisma:migrate:dev": "dotenv -e .env.local -- prisma migrate dev --name"
@@ -68,6 +68,7 @@
         "@types/react-dom": "^19",
         "@typescript-eslint/eslint-plugin": "^8.25.0",
         "check-file": "^1.1.2",
+        "cross-env": "^7.0.3",
         "dotenv-cli": "^8.0.0",
         "eslint": "^9.21.0",
         "eslint-config-next": "^15.1.6",

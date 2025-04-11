@@ -1,5 +1,6 @@
 import {
     CommentCreateRequest,
+    CommentDeleteRequest,
     CommentUpdateRequest,
 } from "@/lib/request/CommentRequest";
 import { PrismaClientManager } from "@/lib/client/PrismaClientManager";
@@ -30,7 +31,8 @@ export class CommentQuery {
         const prisma = PrismaClientManager.getClient();
         return prisma.comment.update({
             where: {
-                token: data.token,
+                token: data.comment_token,
+                user_token: data.user_token,
             },
             data: {
                 content: data.content,
@@ -38,11 +40,32 @@ export class CommentQuery {
         });
     }
 
-    async deleteComment(token: string) {
+    async deleteComment(data: CommentDeleteRequest) {
         const prisma = PrismaClientManager.getClient();
         return prisma.comment.delete({
             where: {
-                token: token,
+                token: data.comment_token,
+                user_token: data.user_token,
+            },
+        });
+    }
+
+    async getComments(token: string) {
+        const prisma = PrismaClientManager.getClient();
+        return prisma.comment.findMany({
+            select: {
+                token: true,
+                parent_comment_token: true,
+                content: true,
+                updatedAt: true,
+                user: {
+                    select: {
+                        nickname: true,
+                    },
+                },
+            },
+            where: {
+                post_token: token,
             },
         });
     }
