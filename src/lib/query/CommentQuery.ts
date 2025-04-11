@@ -49,4 +49,24 @@ export class CommentQuery {
             },
         });
     }
+
+    async getComments(token: string) {
+        const prisma = PrismaClientManager.getClient();
+        return prisma.comment.findMany({
+            select: {
+                token: true,
+                parent_comment_token: true,
+                content: true,
+                updatedAt: true,
+                user: {
+                    select: {
+                        nickname: true,
+                    },
+                },
+            },
+            where: {
+                post_token: token,
+            },
+        });
+    }
 }

@@ -36,4 +36,12 @@ export class CommentRepository {
         }
         return convertBigIntToString(response);
     }
+
+    async findCommentsFromPost(token: string) {
+        const response = await this.query.getComments(token);
+        if (response == null) {
+            return null;
+        }
+        return convertBigIntToString(response);
+    }
 }
