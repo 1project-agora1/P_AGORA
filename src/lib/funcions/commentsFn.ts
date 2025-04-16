@@ -6,7 +6,9 @@ import {
 } from "@/lib/request/CommentRequest";
 import { ApiResponse } from "@/lib/ApiResponse";
 
-export const createComment = async (request: CommentCreateRequest) => {
+export const createComment = async (
+    request: CommentCreateRequest,
+): Promise<ApiResponse> => {
     return restClient.post(`/api/comment/create`, request);
 };
 

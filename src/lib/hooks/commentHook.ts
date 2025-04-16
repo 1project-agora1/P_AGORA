@@ -26,13 +26,9 @@ export const useCommentHook = () => {
             };
             const response = await createComment(request);
 
-            if (response instanceof Response && response.ok) {
-                const data = await response.json();
-                onSuccess(data);
-                toast.success("댓글이 성공적으로 추가되었습니다.");
-            } else {
-                toast.error("댓글 추가에 실패했습니다.");
-            }
+            const data = response.data;
+            onSuccess(data);
+            toast.success("댓글이 성공적으로 추가되었습니다.");
         } catch (error) {
             console.error("Error creating comment:", error);
             toast.error("댓글 추가 중 오류가 발생했습니다.");
