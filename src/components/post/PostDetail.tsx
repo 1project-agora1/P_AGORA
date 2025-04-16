@@ -9,14 +9,13 @@ import { BiLike } from "react-icons/bi";
 import { BsPeople } from "react-icons/bs";
 import { toast } from "react-toastify";
 import CommentForm from "@/components/comment/CommentForm";
-import {
-    CommentListResponse,
-    CommentResponse,
-} from "@/lib/response/CommentResponse";
+import { CommentListResponse } from "@/lib/response/CommentResponse";
+import { useCommentHook } from "@/lib/hooks/commentHook";
 
 const PostDetail: React.FC<PostDetailType> = ({ data }) => {
     const { handleLikePost, handleUnlikePost, handleViewPost, isLikePost } =
         useLikePost();
+    const { handleCommentDelete } = useCommentHook();
     const { user } = useUser();
     const [like, setLike] = useState<number>(data.likes);
     const [views, setViews] = useState<number>(data.views);
@@ -24,7 +23,8 @@ const PostDetail: React.FC<PostDetailType> = ({ data }) => {
     const [viewed, setViewed] = useState<boolean>(false); // 추가: 조회 여부 상태
     const [comments, setComments] = useState<CommentListResponse>({
         data: [],
-    }); // 댓글 상태 추가
+    }); // 댓글 상태
+    const [selectedComment, setSelectedComment] = useState<any>(null); // 선택된 댓글 상태
 
     if (!data) {
         return <div>게시물 데이터를 불러올 수 없습니다.</div>;
@@ -73,8 +73,25 @@ const PostDetail: React.FC<PostDetailType> = ({ data }) => {
     };
 
     // 댓글 작성/수정 후 실행할 함수
-    const handleCommentSubmit = async () => {
+    const fetchCommentSubmit = async () => {
         await fetchComments();
+        setSelectedComment(null);
+    };
+
+    // 댓글 삭제 함수
+    const fetchCommentDelete = async (commentToken: string) => {
+        await handleCommentDelete(
+            commentToken,
+            async () => {
+                await fetchComments();
+                setSelectedComment(null);
+            },
+            user.token,
+        );
+        setComments((prev) => ({
+            ...prev,
+            data: prev.data.filter((c) => c.token !== commentToken),
+        }));
     };
 
     useEffect(() => {
@@ -201,6 +218,28 @@ const PostDetail: React.FC<PostDetailType> = ({ data }) => {
                                           )
                                         : "방금 전"}
                                 </span>
+                                {user.token === comment.user.token && (
+                                    <div className="flex gap-2 mt-1 transition-opacity">
+                                        <button
+                                            onClick={() =>
+                                                setSelectedComment(comment)
+                                            }
+                                            className="text-xs text-blue-500 hover:underline"
+                                        >
+                                            수정
+                                        </button>
+                                        <button
+                                            onClick={() =>
+                                                fetchCommentDelete(
+                                                    comment.token,
+                                                )
+                                            }
+                                            className="text-xs text-red-500 hover:underline"
+                                        >
+                                            삭제
+                                        </button>
+                                    </div>
+                                )}
                             </div>
                         );
                     })
@@ -212,7 +251,9 @@ const PostDetail: React.FC<PostDetailType> = ({ data }) => {
             {/* 댓글 작성 폼 */}
             <CommentForm
                 postToken={data.token}
-                onCommentSubmit={handleCommentSubmit}
+                existingComment={selectedComment}
+                onCommentSubmit={fetchCommentSubmit}
+                onCommentDelete={fetchCommentDelete}
                 currentUserToken={user.token}
             />
         </div>

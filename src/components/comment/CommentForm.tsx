@@ -1,11 +1,13 @@
 import React, { useState } from "react";
 import { toast } from "react-toastify";
 import LoginForm from "@/components/auth/LoginForm";
+import { useCommentHook } from "@/lib/hooks/commentHook";
 
 interface CommentFormProps {
     postToken: string; // 게시물 토큰
     existingComment?: {
         comment_token: string;
+        parent_comment_token?: string;
         user_token: string;
         content: string;
     }; // 수정할 댓글 정보
@@ -28,6 +30,8 @@ const CommentForm: React.FC<CommentFormProps> = ({
     const isLoggedIn =
         typeof currentUserToken === "string" && currentUserToken.trim() !== "";
     const isAuthor = existingComment?.user_token === currentUserToken; // 본인 확인
+    const { handleCommentCreate, handleCommentUpdate, handleCommentDelete } =
+        useCommentHook();
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -42,89 +46,40 @@ const CommentForm: React.FC<CommentFormProps> = ({
             return;
         }
 
-        try {
-            let response;
-            if (existingComment) {
-                // 댓글 수정
-                response = await fetch(`/api/comment/update`, {
-                    method: "PUT",
-                    headers: {
-                        "Content-Type": "application/json",
-                    },
-                    body: JSON.stringify({
-                        user_token: currentUserToken,
-                        comment_token: existingComment?.comment_token,
-                        content: comment,
-                    }),
-                });
-            } else {
-                // 댓글 작성
-                response = await fetch(`/api/comment/create`, {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json",
-                    },
-                    body: JSON.stringify({
-                        user_token: currentUserToken,
-                        post_token: postToken,
-                        content: comment,
-                    }),
-                });
-            }
+        const successHandler = (data: any) => {
+            onCommentSubmit(data);
+            setComment("");
+        };
 
-            if (response.ok) {
-                const data = await response.json();
-                onCommentSubmit(data); // 새로운 댓글 또는 수정된 댓글을 부모 컴포넌트로 전달
-                setComment(""); // 입력 필드 초기화
-                toast.success(
-                    existingComment
-                        ? "댓글이 성공적으로 수정되었습니다."
-                        : "댓글이 성공적으로 추가되었습니다.",
-                );
-            } else {
-                toast.error(
-                    existingComment
-                        ? "댓글 수정에 실패했습니다."
-                        : "댓글 추가에 실패했습니다.",
-                );
-            }
-        } catch (error) {
-            console.error("Error posting comment:", error);
-            toast.error(
-                existingComment
-                    ? "댓글 수정 중 오류가 발생했습니다."
-                    : "댓글 추가 중 오류가 발생했습니다.",
+        // 댓글 수정 및 작성
+        if (existingComment) {
+            // 댓글 수정
+            await handleCommentUpdate(
+                currentUserToken,
+                existingComment.comment_token,
+                comment,
+                successHandler,
+            );
+        } else {
+            // 댓글 작성
+            await handleCommentCreate(
+                currentUserToken,
+                postToken,
+                comment,
+                successHandler,
             );
         }
     };
 
+    // 댓글 삭제
     const handleDelete = async () => {
-        if (!existingComment || !onCommentDelete) return;
-
-        try {
-            // 댓글 삭제
-            const response = await fetch(`/api/comment/delete`, {
-                method: "DELETE",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify({
-                    user_token: currentUserToken,
-                    comment_token: existingComment?.comment_token,
-                }),
-            });
-
-            if (response.ok) {
-                onCommentDelete(existingComment.comment_token); // 삭제된 댓글 토큰을 부모 컴포넌트로 전달
-                toast.success("댓글이 성공적으로 삭제되었습니다.");
-            } else {
-                toast.error("댓글 삭제에 실패했습니다.");
-            }
-        } catch (error) {
-            console.error("Error deleting comment:", error);
-            toast.error("댓글 삭제 중 오류가 발생했습니다.");
-        }
+        await handleCommentDelete(
+            existingComment?.comment_token,
+            onCommentDelete,
+            currentUserToken,
+        );
     };
+
     return (
         <>
             {/*댓글 작성 폼*/}
@@ -162,6 +117,7 @@ const CommentForm: React.FC<CommentFormProps> = ({
                     )}
                 </div>
 
+                {/*댓글 수정 삭제*/}
                 <div className="flex gap-2 mt-2">
                     <button
                         type="submit"
@@ -174,19 +130,22 @@ const CommentForm: React.FC<CommentFormProps> = ({
                     >
                         {existingComment ? "댓글 수정" : "댓글 작성"}
                     </button>
-                    {existingComment && (
-                        <button
-                            type="button"
-                            className="bg-red-500 text-white px-4 py-2 rounded"
-                            onClick={handleDelete}
-                        >
-                            댓글 삭제
-                        </button>
-                    )}
-                    {existingComment && !isAuthor && (
-                        <span className="text-red-500 text-sm">
-                            본인이 작성한 댓글만 수정/삭제할 수 있습니다.
-                        </span>
+                    {existingComment && isLoggedIn && isAuthor && (
+                        <div className="flex gap-2 mt-2">
+                            <button
+                                type="submit"
+                                className="bg-blue-500 text-white px-4 py-2 rounded"
+                            >
+                                수정 완료
+                            </button>
+                            <button
+                                type="button"
+                                className="bg-red-500 text-white px-4 py-2 rounded"
+                                onClick={handleDelete}
+                            >
+                                댓글 삭제
+                            </button>
+                        </div>
                     )}
                 </div>
             </form>

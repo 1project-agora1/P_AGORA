@@ -1,0 +1,18 @@
+import restClient from "@/lib/restClient";
+import {
+    CommentCreateRequest,
+    CommentDeleteRequest,
+    CommentUpdateRequest,
+} from "@/lib/request/CommentRequest";
+
+export const createComment = async (request: CommentCreateRequest) => {
+    return restClient.post(`/api/comment/create`, request);
+};
+
+export const updateComment = async (request: CommentUpdateRequest) => {
+    return restClient.put(`/api/comment/update`, request);
+};
+
+export const deleteComment = async (request: CommentDeleteRequest) => {
+    return restClient.delete(`/api/comment/delete`, request);
+};
