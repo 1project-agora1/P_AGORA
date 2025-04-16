@@ -45,6 +45,11 @@ export const useCommentHook = () => {
         content: string,
         onSuccess: (data: any) => void,
     ) => {
+        const toastId = toast.loading("댓글 수정 중...", {
+            autoClose: false,
+            closeOnClick: false,
+        });
+
         try {
             // 댓글 수정 요청
             const request: CommentUpdateRequest = {
@@ -54,16 +59,23 @@ export const useCommentHook = () => {
             };
             const response = await updateComment(request);
 
-            if (response instanceof Response && response.ok) {
-                const data = await response.json();
-                onSuccess(data);
-                toast.success("댓글이 성공적으로 수정되었습니다.");
-            } else {
-                toast.error("댓글 수정에 실패했습니다.");
-            }
+            const data = response.data;
+
+            onSuccess(data);
+            toast.update(toastId, {
+                render: "댓글이 성공적으로 수정되었습니다.",
+                type: "success",
+                autoClose: 2000,
+                isLoading: false,
+            });
         } catch (error) {
             console.error("Error updating comment:", error);
-            toast.error("댓글 수정 중 오류가 발생했습니다.");
+            toast.update(toastId, {
+                render: "댓글 수정 중 오류가 발생했습니다.",
+                type: "error",
+                autoClose: 3000,
+                isLoading: false,
+            });
         }
     };
 

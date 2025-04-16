@@ -12,7 +12,7 @@ import CommentForm from "@/components/comment/CommentForm";
 import { CommentListResponse } from "@/lib/response/CommentResponse";
 import { useCommentHook } from "@/lib/hooks/commentHook";
 
-const PostDetail: React.FC<PostDetailType> = ({ data }) => {
+const PostDetailForm: React.FC<PostDetailType> = ({ data }) => {
     const { handleLikePost, handleUnlikePost, handleViewPost, isLikePost } =
         useLikePost();
     const { handleCommentDelete } = useCommentHook();
@@ -222,7 +222,12 @@ const PostDetail: React.FC<PostDetailType> = ({ data }) => {
                                     <div className="flex gap-2 mt-1 transition-opacity">
                                         <button
                                             onClick={() =>
-                                                setSelectedComment(comment)
+                                                setSelectedComment({
+                                                    comment_token:
+                                                        comment.token,
+                                                    user_token: user.token,
+                                                    content: comment.content,
+                                                })
                                             }
                                             className="text-xs text-blue-500 hover:underline"
                                         >
@@ -260,4 +265,4 @@ const PostDetail: React.FC<PostDetailType> = ({ data }) => {
     );
 };
 
-export default PostDetail;
+export default PostDetailForm;

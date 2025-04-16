@@ -3,7 +3,7 @@ import { PrismaClientManager } from "@/lib/client/PrismaClientManager";
 import { CommentRepository } from "@/lib/repository/CommentRepository";
 import { CommentUpdateRequest } from "@/lib/request/CommentRequest";
 
-export async function POST(request: Request) {
+export async function PUT(request: Request) {
     try {
         const data: CommentUpdateRequest = await request.json();
         const commentRepository = new CommentRepository();
