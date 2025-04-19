@@ -1,11 +1,14 @@
-import React, { useState } from "react";
+"use client";
+import React, { useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import LoginForm from "@/components/auth/LoginForm";
+import { useCommentHook } from "@/lib/hooks/commentHook";
 
 interface CommentFormProps {
     postToken: string; // 게시물 토큰
     existingComment?: {
         comment_token: string;
+        parent_comment_token?: string;
         user_token: string;
         content: string;
     }; // 수정할 댓글 정보
@@ -18,180 +21,167 @@ const CommentForm: React.FC<CommentFormProps> = ({
     postToken,
     existingComment,
     onCommentSubmit,
-    onCommentDelete,
     currentUserToken,
 }) => {
-    const [comment, setComment] = useState<string>(
+    const [writeComment, setWriteComment] = useState<string>("");
+    const [editComment, setEditComment] = useState<string>(
         existingComment?.content || "",
     );
     const [showLoginModal, setShowLoginModal] = useState<boolean>(false);
     const isLoggedIn =
         typeof currentUserToken === "string" && currentUserToken.trim() !== "";
-    const isAuthor = existingComment?.user_token === currentUserToken; // 본인 확인
+    const isAuthor = existingComment?.user_token === currentUserToken;
+    const [isEditing, setIsEditing] = useState<boolean>(false);
 
-    const handleSubmit = async (e: React.FormEvent) => {
+    const { handleCommentCreate, handleCommentUpdate } = useCommentHook();
+
+    useEffect(() => {
+        setEditComment(existingComment?.content || "");
+        setIsEditing(false);
+    }, [existingComment]);
+
+    // 댓글 작성
+    const handleWriteSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
 
         if (!isLoggedIn) {
-            setShowLoginModal(true); // 비로그인 상태에서 로그인 모달 표시
+            setShowLoginModal(true);
             return;
         }
 
-        if (!comment.trim()) {
+        if (!writeComment.trim()) {
             toast.warning("댓글 내용을 입력해주세요.");
             return;
         }
 
-        try {
-            let response;
-            if (existingComment) {
-                // 댓글 수정
-                response = await fetch(`/api/comment/update`, {
-                    method: "PUT",
-                    headers: {
-                        "Content-Type": "application/json",
-                    },
-                    body: JSON.stringify({
-                        user_token: currentUserToken,
-                        comment_token: existingComment?.comment_token,
-                        content: comment,
-                    }),
-                });
-            } else {
-                // 댓글 작성
-                response = await fetch(`/api/comment/create`, {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json",
-                    },
-                    body: JSON.stringify({
-                        user_token: currentUserToken,
-                        post_token: postToken,
-                        content: comment,
-                    }),
-                });
-            }
+        const successHandler = (data: any) => {
+            onCommentSubmit(data);
+            setWriteComment("");
+        };
 
-            if (response.ok) {
-                const data = await response.json();
-                onCommentSubmit(data); // 새로운 댓글 또는 수정된 댓글을 부모 컴포넌트로 전달
-                setComment(""); // 입력 필드 초기화
-                toast.success(
-                    existingComment
-                        ? "댓글이 성공적으로 수정되었습니다."
-                        : "댓글이 성공적으로 추가되었습니다.",
-                );
-            } else {
-                toast.error(
-                    existingComment
-                        ? "댓글 수정에 실패했습니다."
-                        : "댓글 추가에 실패했습니다.",
-                );
-            }
-        } catch (error) {
-            console.error("Error posting comment:", error);
-            toast.error(
-                existingComment
-                    ? "댓글 수정 중 오류가 발생했습니다."
-                    : "댓글 추가 중 오류가 발생했습니다.",
-            );
-        }
+        await handleCommentCreate(
+            currentUserToken!,
+            postToken,
+            writeComment,
+            successHandler,
+        );
     };
 
-    const handleDelete = async () => {
-        if (!existingComment || !onCommentDelete) return;
+    // 댓글 수정
+    const handleEditSubmit = async (e: React.FormEvent) => {
+        e.preventDefault();
 
-        try {
-            // 댓글 삭제
-            const response = await fetch(`/api/comment/delete`, {
-                method: "DELETE",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify({
-                    user_token: currentUserToken,
-                    comment_token: existingComment?.comment_token,
-                }),
-            });
-
-            if (response.ok) {
-                onCommentDelete(existingComment.comment_token); // 삭제된 댓글 토큰을 부모 컴포넌트로 전달
-                toast.success("댓글이 성공적으로 삭제되었습니다.");
-            } else {
-                toast.error("댓글 삭제에 실패했습니다.");
-            }
-        } catch (error) {
-            console.error("Error deleting comment:", error);
-            toast.error("댓글 삭제 중 오류가 발생했습니다.");
+        if (!editComment.trim()) {
+            toast.warning("댓글 내용을 입력해주세요.");
+            return;
         }
+
+        const successHandler = (data: any) => {
+            onCommentSubmit(data);
+            setIsEditing(false);
+        };
+
+        await handleCommentUpdate(
+            currentUserToken!,
+            existingComment!.comment_token,
+            editComment,
+            successHandler,
+        );
     };
+
+    const handleEditClick = () => setIsEditing(true);
+    const handleCancelEdit = () => {
+        setIsEditing(false);
+        setEditComment(existingComment?.content || "");
+    };
+
     return (
         <>
-            {/*댓글 작성 폼*/}
-            <form onSubmit={handleSubmit} className="mt-4">
-                <div className="relative">
-                    <textarea
-                        className={`w-full border rounded p-2 ${
-                            !isLoggedIn
-                                ? "cursor-pointer bg-gray-100 text-gray-500"
-                                : ""
-                        }`}
-                        placeholder={
-                            isLoggedIn
-                                ? "댓글을 입력하세요..."
-                                : "로그인이 필요합니다."
-                        }
-                        value={comment}
-                        onChange={(e) => {
-                            if (isLoggedIn) setComment(e.target.value);
-                        }}
-                        onClick={() => {
-                            if (!isLoggedIn) setShowLoginModal(true);
-                        }}
-                        readOnly={!isLoggedIn}
-                    />
-
-                    {/* 비로그인 상태에서만 오버레이 표시 */}
-                    {!isLoggedIn && (
-                        <div
-                            className="absolute inset-0 bg-transparent flex items-center justify-center cursor-pointer"
-                            onClick={() => setShowLoginModal(true)}
-                        >
-                            {/* 투명 오버레이 */}
-                        </div>
-                    )}
-                </div>
-
-                <div className="flex gap-2 mt-2">
+            {/* 댓글 작성 폼 */}
+            {!existingComment && (
+                <form onSubmit={handleWriteSubmit} className="mt-4">
+                    <div className="relative">
+                        <textarea
+                            className={`w-full border rounded p-2 ${
+                                !isLoggedIn
+                                    ? "cursor-pointer bg-gray-100 text-gray-500"
+                                    : ""
+                            }`}
+                            placeholder={
+                                isLoggedIn
+                                    ? "댓글을 입력하세요..."
+                                    : "로그인이 필요합니다."
+                            }
+                            value={writeComment}
+                            onChange={(e) => {
+                                if (isLoggedIn) setWriteComment(e.target.value);
+                            }}
+                            onClick={() => {
+                                if (!isLoggedIn) setShowLoginModal(true);
+                            }}
+                            readOnly={!isLoggedIn}
+                        />
+                        {!isLoggedIn && (
+                            <div
+                                className="absolute inset-0 bg-transparent flex items-center justify-center cursor-pointer"
+                                onClick={() => setShowLoginModal(true)}
+                            />
+                        )}
+                    </div>
                     <button
                         type="submit"
-                        className={`px-r py-2 rounded ${
+                        className={`mt-2 px-4 py-2 rounded ${
                             isLoggedIn
                                 ? "bg-primary text-white"
                                 : "bg-gray-400 text-gray-700"
                         }`}
                         disabled={!isLoggedIn}
                     >
-                        {existingComment ? "댓글 수정" : "댓글 작성"}
+                        댓글 작성
                     </button>
-                    {existingComment && (
-                        <button
-                            type="button"
-                            className="bg-red-500 text-white px-4 py-2 rounded"
-                            onClick={handleDelete}
-                        >
-                            댓글 삭제
-                        </button>
-                    )}
-                    {existingComment && !isAuthor && (
-                        <span className="text-red-500 text-sm">
-                            본인이 작성한 댓글만 수정/삭제할 수 있습니다.
-                        </span>
-                    )}
-                </div>
-            </form>
+                </form>
+            )}
 
-            {/* 로그인 요청 모달 */}
+            {/* 댓글 수정 폼 */}
+            {existingComment && isAuthor && (
+                <>
+                    {!isEditing ? (
+                        <div className="flex gap-2 mt-2">
+                            <button
+                                type="button"
+                                className="bg-blue-500 text-white px-4 py-2 rounded"
+                                onClick={handleEditClick}
+                            >
+                                수정
+                            </button>
+                        </div>
+                    ) : (
+                        <form onSubmit={handleEditSubmit} className="mt-2">
+                            <textarea
+                                className="w-full border rounded p-2 bg-yellow-50"
+                                value={editComment}
+                                onChange={(e) => setEditComment(e.target.value)}
+                            />
+                            <div className="flex gap-2 mt-2">
+                                <button
+                                    type="submit"
+                                    className="bg-green-500 text-white px-4 py-2 rounded"
+                                >
+                                    수정 완료
+                                </button>
+                                <button
+                                    type="button"
+                                    className="bg-gray-400 text-white px-4 py-2 rounded"
+                                    onClick={handleCancelEdit}
+                                >
+                                    취소
+                                </button>
+                            </div>
+                        </form>
+                    )}
+                </>
+            )}
+
             {showLoginModal && (
                 <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
                     <div className="bg-white p-6 rounded shadow-lg">
@@ -200,8 +190,8 @@ const CommentForm: React.FC<CommentFormProps> = ({
                         </h2>
                         <LoginForm
                             onSuccess={() => {
-                                setShowLoginModal(false); // 로그인 성공 시 모달 닫기
-                                window.location.reload(); // 페이지 새로고침으로 로그인 상태 반영
+                                setShowLoginModal(false);
+                                window.location.reload();
                             }}
                             onClose={() => setShowLoginModal(false)}
                         />
@@ -211,4 +201,5 @@ const CommentForm: React.FC<CommentFormProps> = ({
         </>
     );
 };
+
 export default CommentForm;

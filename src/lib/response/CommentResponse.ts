@@ -5,6 +5,7 @@ export type CommentResponse = {
     updatedAt: Date;
     user: {
         nickname: string;
+        token: string;
     };
 };
 export type CommentListResponse = {

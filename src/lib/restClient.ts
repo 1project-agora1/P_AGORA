@@ -1,3 +1,5 @@
+import { CommentDeleteRequest } from "@/lib/request/CommentRequest";
+
 const BASE_URL = process.env.NEXT_PUBLIC_ORIGIN_URL;
 
 // TODO: class 화 해보는 것도 좋을듯
@@ -64,11 +66,12 @@ const restClient = {
         const data = await response.json();
         return data as T;
     },
-    delete: async <T>(url: string) => {
+    delete: async <T>(url: string, body: object) => {
         const response = await fetch(`${BASE_URL}${url}`, {
             method: "DELETE",
             headers: { "Content-Type": "application/json" },
             credentials: "include",
+            body: JSON.stringify(body),
         });
         if (!response.ok) {
             throw new Error(`HTTP error! status: ${response.status}`);

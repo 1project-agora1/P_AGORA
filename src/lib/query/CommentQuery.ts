@@ -61,6 +61,7 @@ export class CommentQuery {
                 user: {
                     select: {
                         nickname: true,
+                        token: true,
                     },
                 },
             },

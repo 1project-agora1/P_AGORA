@@ -3,7 +3,7 @@
 import DeleteButton from "@/components/button/DeleteButton";
 import NavButton from "@/components/button/NavButton";
 import SubmitButton from "@/components/button/SubmitButton";
-import PostDetail from "@/components/post/PostDetail";
+import PostDetailForm from "@/components/post/PostDetailForm";
 import { ShareModal } from "@/components/share/ShareModal";
 import { PostDetailAllotType } from "@/lib/types/PostType";
 import { UserType } from "@/lib/types/UserType";
@@ -89,25 +89,25 @@ export default function DetailPage() {
                                         `/api/post/delete?token=${post}`,
                                         {
                                             method: "DELETE",
-                                        }
+                                        },
                                     );
                                     if (res.ok) {
                                         toast.success(
-                                            "게시글이 성공적으로 삭제되었습니다."
+                                            "게시글이 성공적으로 삭제되었습니다.",
                                         );
                                         location.href = `/channel/${channel}/${item}?state=deleteSuccess`;
                                     } else {
                                         toast.error(
-                                            "게시글 삭제에 실패했습니다."
+                                            "게시글 삭제에 실패했습니다.",
                                         );
                                     }
                                 } catch (error) {
                                     console.error(
                                         "삭제 요청 중 오류 발생:",
-                                        error
+                                        error,
                                     );
                                     toast.error(
-                                        "서버 오류로 인해 삭제에 실패했습니다."
+                                        "서버 오류로 인해 삭제에 실패했습니다.",
                                     );
                                 }
                             }}
@@ -127,12 +127,12 @@ export default function DetailPage() {
                 autoClose: false, // 자동 닫힘 비활성화
                 closeOnClick: false, // 클릭 시 닫히지 않도록 설정
                 position: "top-center", // 토스트 위치 설정
-            }
+            },
         );
     };
     return (
         <>
-            {data && <PostDetail data={data} />}
+            {data && <PostDetailForm data={data} />}
             <footer className="flex justify-end my-2">
                 <NavButton
                     url={`/channel/${channel}/${item}`}
